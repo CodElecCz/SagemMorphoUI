@@ -53,9 +53,11 @@
 #include "ui_mainwindow.h"
 #include "settingsdialog.h"
 #include "sagemmorpho.h"
+#include "support/style/CustomStyle.h"
 
 #include <QLabel>
 #include <QMessageBox>
+#include <QApplication>
 
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
@@ -81,6 +83,9 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->statusBar->addWidget(m_status);
 
     initActionsConnections();
+
+    //apply default
+    qApp->setStyle(new CustomStyle(ECustomStyle_Light));
 
     connect(m_serial, &QSerialPort::errorOccurred, this, &MainWindow::handleError);
 

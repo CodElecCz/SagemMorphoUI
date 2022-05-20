@@ -9,13 +9,15 @@ SOURCES += \
     mainwindow.cpp \
     sagemmorpho.cpp \
     settingsdialog.cpp \
-    console.cpp
+    console.cpp \
+    support/style/CustomStyle.cpp
 
 HEADERS += \
     mainwindow.h \
     sagemmorpho.h \
     settingsdialog.h \
-    console.h
+    console.h \
+    support/style/CustomStyle.h
 
 FORMS += \
     mainwindow.ui \
