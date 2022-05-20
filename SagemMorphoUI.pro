@@ -5,7 +5,6 @@ TARGET = terminal
 TEMPLATE = app
 
 SOURCES += \
-    MORPHO/morpho.c \
     main.cpp \
     mainwindow.cpp \
     sagemmorpho.cpp \
@@ -14,7 +13,6 @@ SOURCES += \
     support/style/CustomStyle.cpp
 
 HEADERS += \
-    MORPHO/morpho.h \
     mainwindow.h \
     sagemmorpho.h \
     settingsdialog.h \
