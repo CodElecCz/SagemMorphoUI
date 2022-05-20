@@ -25,6 +25,12 @@ void Console::setLocalEchoEnabled(bool set)
     m_localEchoEnabled = set;
 }
 
+void Console::setData(const QByteArray &data)
+{
+    QPlainTextEdit::insertPlainText(data);
+    emit getData(data);
+}
+
 void Console::keyPressEvent(QKeyEvent *e)
 {
     switch (e->key()) {

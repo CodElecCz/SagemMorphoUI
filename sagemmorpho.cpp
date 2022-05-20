@@ -2,8 +2,6 @@
 #include "console.h"
 #include "ui_sagemmorpho.h"
 
-#include "MORPHO/morpho.h"
-
 SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SagemMorpho)
@@ -34,9 +32,8 @@ void SagemMorpho::clear()
     ui->console->clear();
 }
 
-
 void SagemMorpho::on_desciptorButton_clicked()
 {
-
+    ui->console->setData("$MORPHO 05\n");
 }
 
