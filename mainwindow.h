@@ -87,6 +87,10 @@ private slots:
 
 private:
     void initActionsConnections();
+    void readAppSettings();
+    void writeAppSettings();
+
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     void showStatusMessage(const QString &message);

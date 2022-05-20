@@ -1,5 +1,7 @@
 #include "sagemmorpho.h"
 #include "console.h"
+#include "MORPHO/morpho.h"
+
 #include "ui_sagemmorpho.h"
 
 SagemMorpho::SagemMorpho(QWidget *parent) :

@@ -58,6 +58,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QApplication>
+#include <QSettings>
 
 //! [0]
 MainWindow::MainWindow(QWidget *parent) :
@@ -73,7 +74,10 @@ MainWindow::MainWindow(QWidget *parent) :
 //! [0]
     m_ui->setupUi(this);
     m_console->setEnabled(false);
+
     setCentralWidget(m_console);
+
+    readAppSettings();
 
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
@@ -191,3 +195,33 @@ void MainWindow::showStatusMessage(const QString &message)
 {
     m_status->setText(message);
 }
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    writeAppSettings();
+}
+
+void MainWindow::readAppSettings()
+{
+    QSettings settings("QT", "SagemClient");
+
+    settings.beginGroup("MainWindow");
+
+    restoreGeometry(settings.value("Geometry").toByteArray());
+    restoreState(settings.value("WindowState").toByteArray());
+
+    settings.endGroup();
+}
+
+void MainWindow::writeAppSettings()
+{
+    QSettings settings("QT", "SagemClient");
+
+    settings.beginGroup("MainWindow");
+
+    settings.setValue("Geometry", saveGeometry());
+    settings.setValue("WindowState", saveState());
+
+    settings.endGroup();
+}
+
