@@ -32,3 +32,9 @@ void SagemMorpho::clear()
     ui->console->clear();
 }
 
+
+void SagemMorpho::on_desciptorButton_clicked()
+{
+
+}
+

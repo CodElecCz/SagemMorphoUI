@@ -24,6 +24,9 @@ signals:
 public slots:
     void clear();
 
+private slots:
+    void on_desciptorButton_clicked();
+
 private:
     Ui::SagemMorpho *ui;
 };
