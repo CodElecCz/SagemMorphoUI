@@ -1,6 +1,7 @@
 #include "console.h"
 
 #include <QScrollBar>
+#include <QDateTime>
 
 Console::Console(QWidget *parent) :
     QPlainTextEdit(parent)
@@ -14,7 +15,39 @@ Console::Console(QWidget *parent) :
 
 void Console::putData(const QByteArray &data)
 {
+    QString text;
+    text.append(QString("[%1] %2").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")).arg(data.data()));
+
+    insertPlainText(text);
+
+    QScrollBar *bar = verticalScrollBar();
+    bar->setValue(bar->maximum());
+}
+
+void Console::putDataRaw(const QByteArray &data)
+{
     insertPlainText(data);
+
+    QScrollBar *bar = verticalScrollBar();
+    bar->setValue(bar->maximum());
+}
+
+void Console::putDataHex(const QByteArray &data, bool timestamp)
+{
+    QString hex;
+    if(timestamp)
+        hex.append(QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")));
+
+    foreach(auto d, data)
+    {
+        uint8_t ud = (uint8_t)d;
+        QString number = QStringLiteral("%1 ").arg(ud, 2, 16, QLatin1Char('0'));
+        hex.append(number);
+    }
+    if(timestamp)
+        hex.append('\n');
+
+    insertPlainText(hex);
 
     QScrollBar *bar = verticalScrollBar();
     bar->setValue(bar->maximum());
@@ -27,7 +60,28 @@ void Console::setLocalEchoEnabled(bool set)
 
 void Console::setData(const QByteArray &data)
 {
-    QPlainTextEdit::insertPlainText(data);
+    QString text;
+    text.append(QString("[%1] %2").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")).arg(data.data()));
+
+    QPlainTextEdit::insertPlainText(text);
+    emit getData(data);
+}
+
+void Console::setDataHex(const QByteArray &data)
+{
+    QString hex;
+    hex.append(QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")));
+
+    foreach(auto d, data)
+    {
+        uint8_t ud = (uint8_t)d;
+        QString number = QStringLiteral("%1 ").arg(ud, 2, 16, QLatin1Char('0'));
+        hex.append(number);
+    }
+    hex.append('\n');
+
+    QPlainTextEdit::insertPlainText(hex);
+
     emit getData(data);
 }
 

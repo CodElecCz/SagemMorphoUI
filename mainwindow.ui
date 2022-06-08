@@ -63,6 +63,8 @@
    <addaction name="actionDisconnect"/>
    <addaction name="actionConfigure"/>
    <addaction name="actionClear"/>
+   <addaction name="separator"/>
+   <addaction name="actionBreak"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAbout">
@@ -151,6 +153,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionBreak">
+   <property name="text">
+    <string>$BRK</string>
+   </property>
+   <property name="toolTip">
+    <string>Send break</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
    </property>
   </action>
  </widget>

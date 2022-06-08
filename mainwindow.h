@@ -28,6 +28,7 @@ public:
 private slots:
     void openSerialPort();
     void closeSerialPort();
+    void breakSerialPort();
     void about();
     void writeData(const QByteArray &data);
     void readData();
@@ -49,6 +50,9 @@ private:
     SagemMorpho *m_console = nullptr;
     SettingsDialog *m_settings = nullptr;
     QSerialPort *m_serial = nullptr;
+    QLabel *m_statusLabel = nullptr;
+    uint32_t m_tx = 0;
+    uint32_t m_rx = 0;
 };
 
 #endif // MAINWINDOW_H
