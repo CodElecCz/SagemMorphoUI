@@ -12,40 +12,21 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_GetBaseConfig_Request(uint8_t* packed, size_t* dataSize)
+void MORPHO_GetBaseConfig_Request(uint8_t* packet, size_t* packetSize)
 {
-	size_t packedSize = 0;
+    uint8_t data[4];
+    size_t dataSize = 0;
 
-	//STX 1b
-	packed[packedSize++] = STX;
-
-	//ID 1b - PACKET IDENTIFIER
-	packed[packedSize++] = PACKED_ID_TYPE_DATA|PACKED_ID_FLAG_FIRST|PACKED_ID_FLAG_LAST; //0x61;
-
-	//RC 1b
-	packed[packedSize++] = RequestCounter++;
-
-	//DATA 1024b
+    //DATA 4b
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ILV_GET_BASE_CONFIG;
-	packed[packedSize++] = sizeof(uint8_t);
-	packed[packedSize++] = 0;
-	packed[packedSize++] = 0;
+    data[dataSize++] = ILV_GET_BASE_CONFIG;
+    data[dataSize++] = sizeof(uint8_t);
+    data[dataSize++] = 0;
+    data[dataSize++] = 0;
 
-	//CRC 2b - of data
-	uint8_t CrcH = 0;
-	uint8_t CrcL = 0;
-	IlvCrc16(&packed[3], 4, &CrcH, &CrcL);
-	packed[packedSize++] = CrcL;
-	packed[packedSize++] = CrcH;
-
-	//DLE 1b
-	packed[packedSize++] = DLE;
-
-	//ETX 1b
-	packed[packedSize++] = ETX;
-
-	if(dataSize) *dataSize = packedSize;
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
 }
 
 /*

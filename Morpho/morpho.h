@@ -15,10 +15,18 @@
 extern "C" {
 #endif
 
-int MORPHO_CheckResponse(const uint8_t* data, size_t dataSize, const uint8_t** response, size_t* responseSize);
-int MORPHO_CheckResponseData(const uint8_t* data, size_t dataSize, const uint8_t** value, size_t* valueSize);
+void MORPHO_ResetCounter(void);
+void MORPHO_ResponseAck(const uint8_t* packet, size_t* packetSize);
+void MORPHO_ResponseNack(const uint8_t* packet, size_t* packetSize);
 
-void MORPHO_ResponseAck(uint8_t* packed, size_t* dataSize);
+//request
+void MORPHO_MakeSOP(uint8_t Type, uint8_t First, uint8_t Last, uint8_t RC, uint8_t* PacketToSend, size_t* PacketCurrentSize);
+void MORPHO_AddDataToPacket(uint8_t* PacketToSend, size_t* PacketCurrentSize, uint8_t* Data, size_t SizeOfSendData);
+void MORPHO_AddEOP(uint8_t* PacketToSend, size_t* PacketCurrentSize);
+
+//response
+int MORPHO_ReciveSOP(const uint8_t* packet, size_t packetSize, uint8_t *RC, size_t* sopSize);
+int MORPHO_ReceiveData(uint8_t *packet, size_t packetSize, uint8_t **value, size_t* valueSize);
 
 #ifdef __cplusplus
 }

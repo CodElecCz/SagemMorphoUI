@@ -12,54 +12,35 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_GetData_Request(uint8_t* packed, size_t* dataSize, uint32_t fieldIndex, uint32_t userIndex)
+void MORPHO_GetData_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldIndex, uint32_t userIndex)
 {
-	size_t packedSize = 0;
-
-	//STX 1b
-	packed[packedSize++] = STX;
-
-	//ID 1b - PACKET IDENTIFIER
-	packed[packedSize++] = PACKED_ID_TYPE_DATA|PACKED_ID_FLAG_FIRST|PACKED_ID_FLAG_LAST; //0x61;
-
-	//RC 1b
-	packed[packedSize++] = RequestCounter++;
+    uint8_t data[15];
+    size_t dataSize = 0;
 
 	//DATA 12b
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ILV_GET_DATA;
-	packed[packedSize++] = 5 + 7;
-	packed[packedSize++] = 0;
-	packed[packedSize++] = 0;	//Database identifier
-	packed[packedSize++] = fieldIndex & 0xff;
-	packed[packedSize++] = (fieldIndex >> 8) & 0xff;
-	packed[packedSize++] = (fieldIndex >> 16) & 0xff;
-	packed[packedSize++] = (fieldIndex >> 24) & 0xff;
+    data[dataSize++] = ILV_GET_DATA;
+    data[dataSize++] = 5 + 7;
+    data[dataSize++] = 0;
+    data[dataSize++] = 0;	//Database identifier
+    data[dataSize++] = fieldIndex & 0xff;
+    data[dataSize++] = (fieldIndex >> 8) & 0xff;
+    data[dataSize++] = (fieldIndex >> 16) & 0xff;
+    data[dataSize++] = (fieldIndex >> 24) & 0xff;
 
 	//DATA 7b
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ID_USER_INDEX;
-	packed[packedSize++] = 4;
-	packed[packedSize++] = 0;
-	packed[packedSize++] = userIndex & 0xff;
-	packed[packedSize++] = (userIndex >> 8) & 0xff;
-	packed[packedSize++] = (userIndex >> 16) & 0xff;
-	packed[packedSize++] = (userIndex >> 24) & 0xff;
+    data[dataSize++] = ID_USER_INDEX;
+    data[dataSize++] = 4;
+    data[dataSize++] = 0;
+    data[dataSize++] = userIndex & 0xff;
+    data[dataSize++] = (userIndex >> 8) & 0xff;
+    data[dataSize++] = (userIndex >> 16) & 0xff;
+    data[dataSize++] = (userIndex >> 24) & 0xff;
 
-	//CRC 2b - of data
-	uint8_t CrcH = 0;
-	uint8_t CrcL = 0;
-	IlvCrc16(&packed[3], 15, &CrcH, &CrcL);
-	packed[packedSize++] = CrcL;
-	packed[packedSize++] = CrcH;
-
-	//DLE 1b
-	packed[packedSize++] = DLE;
-
-	//ETX 1b
-	packed[packedSize++] = ETX;
-
-	if(dataSize) *dataSize = packedSize;
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
 }
 
 /*

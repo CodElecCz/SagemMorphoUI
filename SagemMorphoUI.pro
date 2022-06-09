@@ -1,7 +1,7 @@
 QT += widgets serialport
 requires(qtConfig(combobox))
 
-TARGET = terminal
+TARGET = SagemMorphoUI
 TEMPLATE = app
 
 SOURCES += \

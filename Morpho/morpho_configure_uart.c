@@ -12,55 +12,36 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_ConfigureUart_Request(uint8_t* packed, size_t* dataSize, uint32_t bps)
+void MORPHO_ConfigureUart_Request(uint8_t* packet, size_t* packetSize, uint32_t bps)
 {
-	size_t packedSize = 0;
-
-	//STX 1b
-	packed[packedSize++] = STX;
-
-	//ID 1b - PACKET IDENTIFIER
-	packed[packedSize++] = PACKED_ID_TYPE_DATA|PACKED_ID_FLAG_FIRST|PACKED_ID_FLAG_LAST; //0x61;
-
-	//RC 1b
-	packed[packedSize++] = RequestCounter++;
+    uint8_t data[16];
+    size_t dataSize = 0;
 
 	//DATA 14b
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ILV_CONFIG_UART;
-	packed[packedSize++] = 0x0D;
-	packed[packedSize++] = 0;
+    data[dataSize++] = ILV_CONFIG_UART;
+    data[dataSize++] = 0x0D;
+    data[dataSize++] = 0;
 
 	//DATA 10b
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ID_COM1;
-	packed[packedSize++] = 0x0A;
-	packed[packedSize++] = 0;
-	packed[packedSize++] = bps & 0xff;			//baudrate
-	packed[packedSize++] = (bps >> 8) & 0xff;
-	packed[packedSize++] = (bps >> 16) & 0xff;
-	packed[packedSize++] = (bps >> 24) & 0xff;
-	packed[packedSize++] = 8; //byte size
-	packed[packedSize++] = 1; //stop bit
-	packed[packedSize++] = 0; //parity
-	packed[packedSize++] = 2; //flow
-	packed[packedSize++] = 0; //send
-	packed[packedSize++] = 0; //format
+    data[dataSize++] = ID_COM1;
+    data[dataSize++] = 0x0A;
+    data[dataSize++] = 0;
+    data[dataSize++] = bps & 0xff;			//baudrate
+    data[dataSize++] = (bps >> 8) & 0xff;
+    data[dataSize++] = (bps >> 16) & 0xff;
+    data[dataSize++] = (bps >> 24) & 0xff;
+    data[dataSize++] = 8; //byte size
+    data[dataSize++] = 1; //stop bit
+    data[dataSize++] = 0; //parity
+    data[dataSize++] = 2; //flow
+    data[dataSize++] = 0; //send
+    data[dataSize++] = 0; //format
 
-	//CRC 2b - of data
-	uint8_t CrcH = 0;
-	uint8_t CrcL = 0;
-	IlvCrc16(&packed[3], 16, &CrcH, &CrcL);
-	packed[packedSize++] = CrcL;
-	packed[packedSize++] = CrcH;
-
-	//DLE 1b
-	packed[packedSize++] = DLE;
-
-	//ETX 1b
-	packed[packedSize++] = ETX;
-
-	if(dataSize) *dataSize = packedSize;
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
 }
 
 /*

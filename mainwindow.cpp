@@ -30,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->actionQuit->setEnabled(true);
     m_ui->actionConfigure->setEnabled(true);
     m_ui->actionBreak->setEnabled(false);
+    m_ui->action_BDR0->setEnabled(false);
+    m_ui->action_BDR1->setEnabled(false);
+    m_ui->action_SAG0->setEnabled(false);
+    m_ui->action_SAG1->setEnabled(false);
 
     m_ui->statusBar->addWidget(m_status);
 
@@ -67,6 +71,10 @@ void MainWindow::openSerialPort()
         m_ui->actionDisconnect->setEnabled(true);
         m_ui->actionConfigure->setEnabled(false);
         m_ui->actionBreak->setEnabled(true);
+        m_ui->action_BDR0->setEnabled(true);
+        m_ui->action_BDR1->setEnabled(true);
+        m_ui->action_SAG0->setEnabled(true);
+        m_ui->action_SAG1->setEnabled(true);
         showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                           .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                           .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
@@ -86,6 +94,11 @@ void MainWindow::closeSerialPort()
     m_ui->actionDisconnect->setEnabled(false);
     m_ui->actionConfigure->setEnabled(true);
     m_ui->actionBreak->setEnabled(false);
+    m_ui->action_BDR0->setEnabled(false);
+    m_ui->action_BDR1->setEnabled(false);
+    m_ui->action_SAG0->setEnabled(false);
+    m_ui->action_SAG1->setEnabled(false);
+
     showStatusMessage(tr("Disconnected"));
 }
 
@@ -93,6 +106,7 @@ void MainWindow::breakSerialPort()
 {
     m_console->sendBreak();
 }
+
 
 void MainWindow::about()
 {
@@ -137,6 +151,11 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionClear, &QAction::triggered, m_console, &SagemMorpho::clear);
     connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
+
+    connect(m_ui->action_SAG0, &QAction::triggered, m_console, &SagemMorpho::sendSag0);
+    connect(m_ui->action_SAG1, &QAction::triggered, m_console, &SagemMorpho::sendSag1);
+    connect(m_ui->action_BDR0, &QAction::triggered, m_console, &SagemMorpho::sendBdr0);
+    connect(m_ui->action_BDR1, &QAction::triggered, m_console, &SagemMorpho::sendBdr1);
 }
 
 void MainWindow::showStatusMessage(const QString &message)

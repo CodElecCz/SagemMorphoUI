@@ -18,6 +18,7 @@ public:
 
     void putData(const QByteArray &data);
     void setLocalEchoEnabled(bool set);
+
     void sendBreak();
 
 signals:
@@ -26,8 +27,17 @@ signals:
 public slots:
     void clear();
 
+    void sendSag0();
+    void sendSag1();
+    void sendBdr0();
+    void sendBdr1();
+
 private slots:
     void on_desciptorButton_clicked();
+
+    void on_configUartButton_clicked();
+
+    void on_addRecordButton_clicked();
 
 private:
     Ui::SagemMorpho*        ui;

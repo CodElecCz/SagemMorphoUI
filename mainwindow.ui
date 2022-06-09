@@ -64,7 +64,12 @@
    <addaction name="actionConfigure"/>
    <addaction name="actionClear"/>
    <addaction name="separator"/>
+   <addaction name="action_SAG0"/>
+   <addaction name="action_SAG1"/>
+   <addaction name="separator"/>
    <addaction name="actionBreak"/>
+   <addaction name="action_BDR0"/>
+   <addaction name="action_BDR1"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAbout">
@@ -164,6 +169,38 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="action_SAG0">
+   <property name="text">
+    <string>$SAG0</string>
+   </property>
+   <property name="toolTip">
+    <string>Internal reader</string>
+   </property>
+  </action>
+  <action name="action_SAG1">
+   <property name="text">
+    <string>$SAG1</string>
+   </property>
+   <property name="toolTip">
+    <string>External reader</string>
+   </property>
+  </action>
+  <action name="action_BDR0">
+   <property name="text">
+    <string>$BDR0</string>
+   </property>
+   <property name="toolTip">
+    <string>Baudrate 9600</string>
+   </property>
+  </action>
+  <action name="action_BDR1">
+   <property name="text">
+    <string>$BDR1</string>
+   </property>
+   <property name="toolTip">
+    <string>Baudrate 115200</string>
    </property>
   </action>
  </widget>

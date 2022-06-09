@@ -12,79 +12,60 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_AddBaseRecord_Request(uint8_t* packed, size_t* dataSize,
+void MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 							     const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
 								 const char* userId,
 								 const char* userData[], size_t userDataSize,
 								 uint8_t no_check)
 {
-	size_t packedSize = 0;
-
-	//STX 1b
-	packed[packedSize++] = STX;
-
-	//ID 1b - PACKET IDENTIFIER
-	packed[packedSize++] = PACKED_ID_TYPE_DATA|PACKED_ID_FLAG_FIRST|PACKED_ID_FLAG_LAST; //0x61;
-
-	//RC 1b
-	packed[packedSize++] = RequestCounter++;
+    uint8_t data[256];
+    size_t dataSize = 0;
 
 	//DATA
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ILV_ADD_RECORD;
-	packed[packedSize++] = 1;
-	packed[packedSize++] = 0;
-	packed[packedSize++] = 0;	//Database identifier
+    data[dataSize++] = ILV_ADD_RECORD;
+    data[dataSize++] = 0;
+    data[dataSize++] = 0;
+    data[dataSize++] = 0;	//Database identifier
 
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = tmplateId;
-	packed[packedSize++] = tmplateSize;
-	packed[packedSize++] = 0;
-	memcpy(&packed[packedSize], tmplate, tmplateSize);
-	packedSize += tmplateSize;
+    data[dataSize++] = tmplateId;
+    data[dataSize++] = tmplateSize;
+    data[dataSize++] = 0;
+    memcpy(&data[dataSize], tmplate, tmplateSize);
+    dataSize += tmplateSize;
 
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ID_USER_ID;
-	packed[packedSize++] = strlen(userId) + 1;
-	packed[packedSize++] = 0;
-	memcpy(&packed[packedSize], userId, strlen(userId));
-	packedSize += strlen(userId);
-	packed[packedSize++] = 0;
+    data[dataSize++] = ID_USER_ID;
+    data[dataSize++] = strlen(userId) + 1;
+    data[dataSize++] = 0;
+    memcpy(&data[dataSize], userId, strlen(userId));
+    dataSize += strlen(userId);
+    data[dataSize++] = 0;
 
 	for(int i = 0; i < userDataSize; i++)
 	{
 		//ILV - Identifier 1b/Length 2b/Value
-		packed[packedSize++] = ID_PUC_DATA;
-		packed[packedSize++] = strlen(userData[i]) + 1;
-		packed[packedSize++] = 0;
-		memcpy(&packed[packedSize], userData[i], strlen(userData[i]));
-		packedSize += strlen(userData[i]);
-		packed[packedSize++] = 0;
+        data[dataSize++] = ID_PUC_DATA;
+        data[dataSize++] = strlen(userData[i]) + 1;
+        data[dataSize++] = 0;
+        memcpy(&data[dataSize], userData[i], strlen(userData[i]));
+        dataSize += strlen(userData[i]);
+        data[dataSize++] = 0;
 	}
 
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ID_NO_CHECK_ON_TEMPLATE;			//No check on template
-	packed[packedSize++] = 1;
-	packed[packedSize++] = 0;
-	packed[packedSize++] = no_check;
+    data[dataSize++] = ID_NO_CHECK_ON_TEMPLATE;			//No check on template
+    data[dataSize++] = 1;
+    data[dataSize++] = 0;
+    data[dataSize++] = no_check;
 
 	//recalculate size
-	packed[4] = packedSize - 3 - 3;
+    data[1] = dataSize - 3;
 
-	//CRC 2b - of data
-	uint8_t CrcH = 0;
-	uint8_t CrcL = 0;
-	IlvCrc16(&packed[3], packedSize - 3, &CrcH, &CrcL);
-	packed[packedSize++] = CrcL;
-	packed[packedSize++] = CrcH;
-
-	//DLE 1b
-	packed[packedSize++] = DLE;
-
-	//ETX 1b
-	packed[packedSize++] = ETX;
-
-	if(dataSize) *dataSize = packedSize;
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
 }
 
 /*

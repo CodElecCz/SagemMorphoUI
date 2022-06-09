@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-void MORPHO_GetBaseConfig_Request(uint8_t* data, size_t* dataSize);
+void MORPHO_GetBaseConfig_Request(uint8_t* packet, size_t* packetSize);
 int MORPHO_GetBaseConfig_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus);
 
 #ifdef __cplusplus

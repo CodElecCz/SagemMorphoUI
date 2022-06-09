@@ -15,7 +15,7 @@ public:
 
     void setData(const QByteArray &data);
     void setDataHex(const QByteArray &data);
-    void putData(const QByteArray &data);
+    void putData(const QByteArray &data, bool timestamp = true);
     void putDataHex(const QByteArray &data, bool timestamp = true);
     void putDataRaw(const QByteArray &data);
     void setLocalEchoEnabled(bool set);

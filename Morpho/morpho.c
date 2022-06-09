@@ -14,103 +14,234 @@
 #include <string.h>
 #include <stdio.h>
 
-uint8_t 				RequestCounter = 0;
-static uint16_t 		ResponseCounter = 0;
+uint8_t 			RequestCounter = 0;
+static uint8_t 		ResponseCounter = 0;
 
-
-void MORPHO_ResponseAck(uint8_t* packed, size_t* dataSize)
+void MORPHO_ResetCounter(void)
 {
-	size_t packedSize = 0;
-
-	//STX 1b
-	packed[packedSize++] = STX;
-
-	//ID 1b - PACKET IDENTIFIER
-	packed[packedSize++] = PACKED_ID_TYPE_ACK|PACKED_ID_FLAG_FIRST|PACKED_ID_FLAG_LAST; //0x62;
-
-    //RC 1b
-	packed[packedSize++] = ResponseCounter & 0xff;
-
-    if(dataSize) *dataSize = packedSize;
+    RequestCounter = 0;
+    ResponseCounter = 0;
 }
 
-int MORPHO_CheckResponse(const uint8_t* data, size_t dataSize, const uint8_t** response, size_t* responseSize)
+void MORPHO_ResponseAck(const uint8_t* packet, size_t* packetSize)
 {
-	if(dataSize < 3)
+    MORPHO_MakeSOP(PACKED_ID_TYPE_ACK, 1, 1, ResponseCounter, packet, packetSize);
+    RequestCounter += 1;
+}
+
+void MORPHO_ResponseNack(const uint8_t* packet, size_t* packetSize)
+{
+    MORPHO_MakeSOP(PACKED_ID_TYPE_NACK, 1, 1, ResponseCounter, packet, packetSize);
+    RequestCounter += 1;
+}
+
+void MORPHO_MakeSOP(uint8_t Type, uint8_t First, uint8_t Last, uint8_t RC, uint8_t* PacketToSend, size_t* PacketCurrentSize)
+{
+    uint8_t Byte;
+
+    //  ajout STX
+    PacketToSend[0] = STX;
+
+    //  ajout ID
+    Byte = Type;
+    if (First)
+        Byte |= PACKED_ID_FLAG_FIRST;
+    if (Last)
+        Byte |= PACKED_ID_FLAG_LAST;
+
+    PacketToSend[1] = Byte;
+
+    //  stuffing sur RC et ajout de RC
+    switch (RC)
+    {
+        case DLE:
+            PacketToSend[2] = DLE;
+            PacketToSend[3] = DLE;
+            *PacketCurrentSize = 4;
+            break;
+        case XON:
+            PacketToSend[2] = DLE;
+            PacketToSend[3] = XON+1;
+            *PacketCurrentSize = 4;
+            break;
+        case XOFF:
+            PacketToSend[2] = DLE;
+            PacketToSend[3] = XOFF+1;
+            *PacketCurrentSize = 4;
+            break;
+        default:
+            PacketToSend[2] = RC;
+            *PacketCurrentSize = 3;
+    }
+}
+
+void MORPHO_AddDataToPacket(uint8_t* PacketToSend, size_t* PacketCurrentSize, uint8_t* Data, size_t SizeOfSendData)
+{
+    uint32_t i;
+    uint8_t CRC[2] = {0x00,0x00};
+
+    // Calcul du CRC
+    IlvCrc16(Data, SizeOfSendData, CRC+1, CRC);
+
+    // Ajout des Data en faisant le stuffing
+    for(i = 0; i < SizeOfSendData; i++)
+    {
+        switch (Data[i])
+        {
+            case DLE:
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                break;
+            case XON:
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                PacketToSend[(*PacketCurrentSize)++] = XON+1;
+                break;
+            case XOFF:
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                PacketToSend[(*PacketCurrentSize)++] = XOFF+1;
+                break;
+            default:
+                PacketToSend[(*PacketCurrentSize)++] = Data[i];
+                break;
+        }
+    }
+
+    // Ajout du CRC en faisant le Stuffing
+    for(i = 0; i < 2; i++)
+    {
+        switch (CRC[i])
+        {
+            case DLE:
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                break;
+            case XON:
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                PacketToSend[(*PacketCurrentSize)++] = XON+1;
+                break;
+            case XOFF:
+                PacketToSend[(*PacketCurrentSize)++] = DLE;
+                PacketToSend[(*PacketCurrentSize)++] = XOFF+1;
+                break;
+            default:
+                PacketToSend[(*PacketCurrentSize)++] = CRC[i];
+                break;
+        }
+    }
+}
+
+void MORPHO_AddEOP(uint8_t* PacketToSend, size_t* PacketCurrentSize)
+{
+    PacketToSend[(*PacketCurrentSize)++] = DLE;
+    PacketToSend[(*PacketCurrentSize)++] = ETX;
+}
+
+static int MORPHO_UnStuffing(uint8_t* Data)
+{
+    switch (*Data)
+    {
+        case DLE:
+            break;
+        case XON+1:
+            *Data = XON;	// <XON>
+            break;
+        case XOFF+1:
+            *Data = XOFF;	// <XOFF>
+            break;
+        default:
+            break;
+    }
+
+    return MORPHO_OK;
+}
+
+static int MORPHO_UnStuffingData(uint8_t* Data, size_t* DataSize)
+{
+    size_t dataSize = *DataSize;
+    uint32_t i;
+    uint32_t act = 0;
+
+    for(i = 0; i < dataSize; i++, act++)
+    {
+        if(Data[i] == DLE)
+        {
+            i++;
+            uint8_t d = Data[i];
+            MORPHO_UnStuffing(&d);
+            Data[act] = d;
+        }
+        else
+        {
+            Data[act] = Data[i];
+        }
+    }
+
+    *DataSize = act;
+
+    return MORPHO_OK;
+}
+
+int MORPHO_ReciveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size_t* sopSize)
+{
+    if(packetSize < 3)
 		return MORPHO_ERR_RESPONSE_LENGTH;
 
-	if(data[0] != STX)
+    if(packet[0] != STX)
 		return MORPHO_ERR_RESPONSE_STX;
 
-	if(data[2] != (RequestCounter - 1))
-		return MORPHO_ERR_RESPONSE_RC;
+    if(packet[1]&PACKED_ID_TYPE_NACK)
+        return MORPHO_ERR_RESPONSE_NACK;
 
-	if(data[1]&PACKED_ID_TYPE_NACK)
-		return MORPHO_ERR_RESPONSE_NACK;
+    if(packet[2] != DLE)
+    {
+        *RC = packet[2];
+        *sopSize = 3;
+    }
+    else //stuffed
+    {
+        if(packetSize < 4)
+            return MORPHO_ERR_RESPONSE_LENGTH;
 
-	if(data[1]&PACKED_ID_TYPE_ACK)
-	{
-		if(dataSize >= (3 + 10))
-		{
-			*response = &data[3];
-			*responseSize = dataSize - 3;
-		}
-	}
+        uint8_t rc = packet[3];
+        MORPHO_UnStuffing(&rc);
+        *RC = rc;
+        *sopSize = 4;
+    }
 
 	return MORPHO_OK;
 }
 
-int MORPHO_CheckResponseData(const uint8_t* data, size_t dataSize, const uint8_t** value, size_t* valueSize)
+int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t** value, size_t* valueSize)
 {
-	if(dataSize < 10)
-		return MORPHO_ERR_DATA_LENGTH;
+    size_t sopSize = 0;
+    uint8_t rc = 0;
+    int err = MORPHO_ReciveSOP(packet, packetSize, &rc, &sopSize);
+    if(err < MORPHO_OK)
+        return err;
 
-	if(data[0] != STX)
-		return MORPHO_ERR_DATA_STX;
+    ResponseCounter = rc;
 
-	if((data[1]&PACKED_ID_TYPE_DATA) == 0)
-		return MORPHO_ERR_DATA_FLAG;
+    if(packetSize < (sopSize + 4))
+        return MORPHO_ERR_RESPONSE_LENGTH;
 
-	ResponseCounter = data[2];
-	uint32_t lengthIndex = 4;
+    if(packet[packetSize - 2] != DLE)
+        return MORPHO_ERR_DATA_DLE;
 
-	//TODO: issue, sometimes 2bytes instead of one
-#if 0
-	if(data[3] != Request)
-	{
-		if(data[4] != Request)
-			return MORPHO_ERR_REQUEST_ID;
+    if(packet[packetSize - 1] != ETX)
+        return MORPHO_ERR_DATA_ETX;
 
-		ResponseCounter = data[2] + (data[3] << 8);
-		lengthIndex++;
-	}
-#endif
-	uint16_t length = data[lengthIndex] + (data[lengthIndex + 1] << 8);
+    uint8_t* stuffed = &packet[sopSize];
+    size_t stuffedSize = packetSize - sopSize - 2;
 
-	if(length + 10 > dataSize)
-		return MORPHO_ERR_VAL_LENGTH;
+    MORPHO_UnStuffingData(stuffed, &stuffedSize);
 
-#if 0
-	uint8_t CrcL = data[6 + length];
-	uint8_t CrcH = data[6 + length + 1];
+    //ILV 1b + 2b + data
+    uint16_t length = stuffed[1] + (stuffed[2] << 8);
+    if(length != stuffedSize - 3 - 2) //3 ILV + 2 CRC
+        return MORPHO_ERR_VAL_LENGTH;
 
-	if(data[6 + length + 2] != DLE)
-		return MORPHO_ERR_DATA_DLE;
-
-	if(data[6 + length + 3] != ETX)
-		return MORPHO_ERR_DATA_ETX;
-#else //index from end - data length issue
-	uint8_t CrcL = data[dataSize - 4];
-	uint8_t CrcH = data[dataSize - 3];
-
-	if(data[dataSize - 2] != DLE)
-		return MORPHO_ERR_DATA_DLE;
-
-	if(data[dataSize - 1] != ETX)
-		return MORPHO_ERR_DATA_ETX;
-#endif
-	*value = &data[lengthIndex + 2];
-	*valueSize = dataSize - 10;
+    *value = &stuffed[3];
+    *valueSize = stuffedSize - 3 - 2;
 
 	return MORPHO_OK;
 }

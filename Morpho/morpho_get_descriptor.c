@@ -3,8 +3,6 @@
 #include "morpho.h"
 
 #include "Ilv_definitions.h"
-#include "Ilv_crc.h"
-#include "Ilv_errors.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -12,40 +10,21 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_GetDescriptor_Request(uint8_t* packed, size_t* dataSize)
-{
-	size_t packedSize = 0;
+void MORPHO_GetDescriptor_Request(uint8_t* packet, size_t* packetSize)
+{    
+    uint8_t data[4];
+    size_t dataSize = 0;
 
-	//STX 1b
-	packed[packedSize++] = STX;
-
-	//ID 1b - PACKET IDENTIFIER
-	packed[packedSize++] = PACKED_ID_TYPE_DATA|PACKED_ID_FLAG_FIRST|PACKED_ID_FLAG_LAST; //0x61;
-
-	//RC 1b
-	packed[packedSize++] = RequestCounter++;
-
-	//DATA 1024b
+    //DATA 4b
 	//ILV - Identifier 1b/Length 2b/Value
-	packed[packedSize++] = ILV_GET_DESCRIPTOR;
-	packed[packedSize++] = sizeof(uint8_t);
-	packed[packedSize++] = 0;
-	packed[packedSize++] = ID_FORMAT_TEXT;
+    data[dataSize++] = ILV_GET_DESCRIPTOR;
+    data[dataSize++] = sizeof(uint8_t);
+    data[dataSize++] = 0;
+    data[dataSize++] = ID_FORMAT_TEXT;
 
-	//CRC 2b - of data
-	uint8_t CrcH = 0;
-	uint8_t CrcL = 0;
-	IlvCrc16(&packed[3], 4, &CrcH, &CrcL);
-	packed[packedSize++] = CrcL;
-	packed[packedSize++] = CrcH;
-
-	//DLE 1b
-	packed[packedSize++] = DLE;
-
-	//ETX 1b
-	packed[packedSize++] = ETX;
-
-	if(dataSize) *dataSize = packedSize;
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
 }
 
 /*
@@ -101,8 +80,9 @@ int MORPHO_GetDescriptor_Response(const uint8_t* value, size_t valueSize, uint8_
 
 		do
 		{
-			uint8_t desc = value[index++];
-			uint16_t size = value[index++] + (value[index++]<<8);
+            uint8_t desc = value[index];
+            uint16_t size = value[index + 1] + (value[index + 2] << 8);
+            index += 3;
 
 			switch(desc)
 			{

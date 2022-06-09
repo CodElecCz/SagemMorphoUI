@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-void MORPHO_ConfigureUart_Request(uint8_t* data, size_t* dataSize, uint32_t bps);
+void MORPHO_ConfigureUart_Request(uint8_t* packet, size_t* packetSize, uint32_t bps);
 int MORPHO_ConfigureUart_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus);
 
 #ifdef __cplusplus
