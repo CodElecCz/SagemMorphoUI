@@ -40,9 +40,14 @@ private slots:
     void on_addRecordButton_clicked();
 
 private:
+    void addRecord(int userId);
+
+private:
     Ui::SagemMorpho*        ui;
     enum MorphoRequest		m_request;
     QByteArray              m_response;
+    int                     m_userId;
+    int                     m_repeat;
 };
 
 #endif // SAGEMMORPHO_H

@@ -59,7 +59,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -110,7 +110,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -123,7 +123,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -160,13 +160,6 @@
                <property name="bottomMargin">
                 <number>6</number>
                </property>
-               <item row="0" column="0" alignment="Qt::AlignRight">
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>User index [%08d]</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="1" alignment="Qt::AlignHCenter">
                 <widget class="QSpinBox" name="userStartBox">
                  <property name="minimum">
@@ -174,6 +167,30 @@
                  </property>
                  <property name="maximum">
                   <number>1000</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0" alignment="Qt::AlignRight">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>User ID:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1" alignment="Qt::AlignHCenter">
+                <widget class="QSpinBox" name="userCountBox">
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>1000</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" alignment="Qt::AlignRight">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>User count:</string>
                  </property>
                 </widget>
                </item>
@@ -201,7 +218,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -214,7 +231,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -227,7 +244,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -240,7 +257,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -253,7 +270,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>341</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>

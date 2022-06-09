@@ -14,7 +14,9 @@
 SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SagemMorpho),
-    m_request(MorphoRequest_None)
+    m_request(MorphoRequest_None),
+    m_userId(1),
+    m_repeat(1)
 {
     ui->setupUi(this);
 
@@ -142,9 +144,27 @@ void SagemMorpho::putData(const QByteArray &data)
         QByteArray request;
         request.append((char*)ack, ackSize);
 
-        ui->console->setDataHex(request);
+        ui->console->setDataHex(request);        
 
-        m_request = MorphoRequest_None;
+        switch(m_request)
+        {
+        case MorphoRequest_AddBaseRecord:
+            m_repeat--;
+            if(m_repeat > 0)
+            {
+                addRecord(++m_userId);
+            }
+            else
+            {
+                m_repeat = 1;
+                m_request = MorphoRequest_None;
+            }
+            break;
+        default:
+            m_repeat = 1;
+            m_request = MorphoRequest_None;
+            break;
+        }
     }
     else
     {
@@ -247,6 +267,14 @@ static const uint8_t tmplate[] =
 
 void SagemMorpho::on_addRecordButton_clicked()
 {
+    m_userId = ui->userStartBox->value();
+    m_repeat = ui->userCountBox->value();
+
+    addRecord(m_userId);
+}
+
+void SagemMorpho::addRecord(int userId)
+{
     m_request = MorphoRequest_AddBaseRecord;
 
     m_response.clear();
@@ -257,7 +285,6 @@ void SagemMorpho::on_addRecordButton_clicked()
     size_t userDataSize = 2;
     uint8_t no_check = 1;
 
-    int userId = ui->userStartBox->value();
     QString user = QStringLiteral("%1 ").arg(userId, 8, 10, QLatin1Char('0'));
 
     uint8_t data[1024];
