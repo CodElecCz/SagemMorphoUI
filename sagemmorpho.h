@@ -39,6 +39,8 @@ private slots:
 
     void on_addRecordButton_clicked();
 
+    void on_eraseBaseButton_clicked();
+
 private:
     void addRecord(int userId);
 

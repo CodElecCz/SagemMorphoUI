@@ -22,6 +22,7 @@ enum MorphoRequest
 	MorphoRequest_GetBaseConfig = ILV_GET_BASE_CONFIG,
 	MorphoRequest_GetData       = ILV_GET_DATA,
 	MorphoRequest_AddBaseRecord = ILV_ADD_RECORD,
+    MorphoRequest_EraseBase     = ILV_ERASE_BASE,
 };
 
 #define DLE						0x1B
@@ -52,8 +53,9 @@ enum MorphoRequest
 /*
  * MORPHO
  */
-#define MORPHO_WARN_VAL_NO_DATA		2
-#define MORPHO_WARN_VAL_ILV_STATUS	1
+#define MORPHO_WARN_VAL_NO_DATA		3
+#define MORPHO_WARN_VAL_ILV_STATUS	2
+#define MORPHO_WARN_VAL_ILV_ERROR	1
 #define MORPHO_OK					0
 #define MORPHO_ERR_RESPONSE_LENGTH	-1
 #define MORPHO_ERR_RESPONSE_STX		-2

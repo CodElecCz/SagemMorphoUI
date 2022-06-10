@@ -17,7 +17,7 @@ void Console::putData(const QByteArray &data, bool timestamp)
 {
     QString text;
     if(timestamp)
-        text.append(QString("[%1] %2").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")).arg(data.data()));
+        text.append(QString("[%1|Rx] %2").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")).arg(data.data()));
     else
         text = data;
 
@@ -39,7 +39,7 @@ void Console::putDataHex(const QByteArray &data, bool timestamp)
 {
     QString hex;
     if(timestamp)
-        hex.append(QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")));
+        hex.append(QString("[%1|Rx] ").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")));
 
     foreach(auto d, data)
     {
@@ -64,7 +64,7 @@ void Console::setLocalEchoEnabled(bool set)
 void Console::setData(const QByteArray &data)
 {
     QString text;
-    text.append(QString("[%1] %2").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")).arg(data.data()));
+    text.append(QString("[%1|Tx] %2").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")).arg(data.data()));
 
     QPlainTextEdit::insertPlainText(text);
     emit getData(data);
@@ -73,7 +73,7 @@ void Console::setData(const QByteArray &data)
 void Console::setDataHex(const QByteArray &data)
 {
     QString hex;
-    hex.append(QString("[%1] ").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")));
+    hex.append(QString("[%1|Tx] ").arg(QDateTime::currentDateTime().toString("hh:mm:ss.zzz")));
 
     foreach(auto d, data)
     {

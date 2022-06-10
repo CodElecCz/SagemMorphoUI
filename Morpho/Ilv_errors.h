@@ -12,7 +12,8 @@ extern "C"
 {
 #endif
 
-const uint8_t* IlvConvertError(uint8_t error);
+const char* IlvConvertError(uint8_t error);
+const char* IlvConvertStatus(uint8_t status);
 
 #ifdef __cplusplus
 }

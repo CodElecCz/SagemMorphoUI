@@ -104,7 +104,7 @@ int MORPHO_GetDescriptor_Response(const uint8_t* value, size_t valueSize, uint8_
 		}while(index < valueSize);
 	}
 	else
-		return MORPHO_WARN_VAL_ILV_STATUS;
+        return MORPHO_WARN_VAL_ILV_ERROR;
 
 	return MORPHO_OK;
 }

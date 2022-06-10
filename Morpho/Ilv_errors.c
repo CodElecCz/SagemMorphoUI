@@ -7,7 +7,7 @@
 typedef struct
 {
 	uint8_t	ErrorCode;
-	uint8_t  ErrorString[64];
+    char  ErrorString[64];
 } IVL_ERROR_TABLE;
 
 // Error Table with string explanation
@@ -17,7 +17,7 @@ static IVL_ERROR_TABLE IlvErrorTable[] =   /*01234567890123456789012345678901234
 			{ ILVERR_ERROR,					"An error occurred" },										// 0xFF
 			{ ILVERR_BADPARAMETER,			"Input parameters are not valid" }, 						// 0xFE
 			{ ILVERR_INVALID_MINUTIAE,		"The minutiae is not valid" },      				 		// 0xFD
-			{ ILVERR_INVALID_USER_ID,		"The record identifier does not exist in the dbs" },		// 0xFC
+            { ILVERR_INVALID_USER_ID,		"The User ID is not valid" },                               // 0xFC
 			{ ILVERR_INVALID_USER_DATA,		"The user data are not valid" },    			 			// 0xFB 
 			{ ILVERR_TIMEOUT,				"No response after defined time" }, 						// 0xFA 
 			{ ILVERR_INVALID_ID_PROTOCOL,	"The protocole used is not valid" },						// 0xF9
@@ -39,14 +39,32 @@ static IVL_ERROR_TABLE IlvErrorTable[] =   /*01234567890123456789012345678901234
 			{ ILVERR_MOIST_FINGER,			"Too moist finger detected" },								// 0xDA
 		};
 
+static IVL_ERROR_TABLE IlvStatusTable[] =   /*01234567890123456789012345678901234567890123456789*/
+        {
+            { ILVSTS_OK,					"Successful"},                                              // 0x00
+            { ILVSTS_HIT,					"Authentication or Identification succeeded" },				// 0x01
+            { ILVSTS_NO_HIT,                "Authentication or Identification failed" },                // 0x02
+            { ILVSTS_LATENT,                "Latent" },                                                 // 0x03
+            { ILVSTS_DB_FULL,               "The database is full." },                                  // 0x04
+            { ILVSTS_DB_EMPTY,              "The database is empty." },                                 // 0x05
+            { ILVSTS_BAD_QUALITY,           "Bad finger and-or enroll qualityy" }, 						// 0x06
+            { ILVSTS_DB_OK,                 "The database is right" },                                  // 0x07
+            { ILVSTS_ACTIVATED,             "The MorphoModule is activated"},                           // 0x08
+            { ILVSTS_NOTACTIVATED,          "The MorphoModule is not activated"},   					// 0x09
+            { ILVSTS_DB_KO,                 "The flash can not be accessed"},                           // 0x10
+        };
+
 static size_t	NbError = sizeof(IlvErrorTable)/sizeof(IVL_ERROR_TABLE);
-static char IlvErrorNotFound[] = "Error not found";
+static size_t	NbStatus = sizeof(IlvStatusTable)/sizeof(IVL_ERROR_TABLE);
+
+static const char IlvErrorNotFound[] = "Error not found";
+static const char IlvStatusNotFound[] = "Status not found";
 
 /*****************************************************************************/
 /*****************************************************************************/
-const uint8_t* IlvConvertError(uint8_t error)
+const char* IlvConvertError(uint8_t error)
 {
-	int i;
+    size_t i;
 
 	for(i=0; i<NbError; i++)
 	{
@@ -62,4 +80,24 @@ const uint8_t* IlvConvertError(uint8_t error)
 	}
 
 	return NULL;
+}
+
+const char* IlvConvertStatus(uint8_t status)
+{
+    size_t i;
+
+    for(i=0; i<NbStatus; i++)
+    {
+        if(IlvStatusTable[i].ErrorCode == status)
+        {
+            return IlvStatusTable[i].ErrorString;
+        }
+    }
+
+    if( i == NbStatus)
+    {
+        return IlvStatusNotFound;
+    }
+
+    return NULL;
 }
