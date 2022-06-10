@@ -8,6 +8,8 @@
 #include "Morpho/morpho_get_data.h"
 #include "Morpho/morpho_get_base_config.h"
 #include "Morpho/morpho_erase_base.h"
+#include "Morpho/morpho_destroy_base.h"
+#include "Morpho/morpho_create_base.h"
 #include "Morpho/Ilv_errors.h"
 
 #include "ui_sagemmorpho.h"
@@ -90,6 +92,8 @@ void SagemMorpho::putData(const QByteArray &data)
         case MorphoRequest_GetBaseConfig:
             {
                 err = MORPHO_GetBaseConfig_Response(value, valueSize, &ilvErr);
+
+                ui->console->putDataHex(m_response);
             }
             break;
         case MorphoRequest_AddBaseRecord:
@@ -120,6 +124,20 @@ void SagemMorpho::putData(const QByteArray &data)
         case MorphoRequest_EraseBase:
             {
                 err = MORPHO_EraseBase_Response(value, valueSize, &ilvErr);
+
+                ui->console->putDataHex(m_response);
+            }
+            break;
+        case MorphoRequest_DestroyBase:
+            {
+                err = MORPHO_DestroyBase_Response(value, valueSize, &ilvErr);
+
+                ui->console->putDataHex(m_response);
+            }
+            break;
+        case MorphoRequest_CreateBase:
+            {
+                err = MORPHO_CreateBase_Response(value, valueSize, &ilvErr);
 
                 ui->console->putDataHex(m_response);
             }
@@ -333,6 +351,56 @@ void SagemMorpho::ack()
 
     QByteArray request;
     request.append((char*)ack, ackSize);
+
+    ui->console->setDataHex(request);
+}
+
+
+void SagemMorpho::on_destroyBaseButton_clicked()
+{
+    m_request = MorphoRequest_DestroyBase;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_DestroyBase_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+void SagemMorpho::on_createBaseButton_clicked()
+{
+    m_request = MorphoRequest_CreateBase;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_CreateBase_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+
+void SagemMorpho::on_getBaseConfigButton_clicked()
+{
+    m_request = MorphoRequest_GetBaseConfig;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_GetBaseConfig_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
 
     ui->console->setDataHex(request);
 }

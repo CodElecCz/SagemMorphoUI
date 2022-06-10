@@ -37,6 +37,10 @@ private slots:
     void on_configUartButton_clicked();
     void on_addRecordButton_clicked();
     void on_eraseBaseButton_clicked();
+    void on_destroyBaseButton_clicked();
+    void on_createBaseButton_clicked();
+
+    void on_getBaseConfigButton_clicked();
 
 private:
     void addRecord(int userId);

@@ -23,6 +23,8 @@ enum MorphoRequest
 	MorphoRequest_GetData       = ILV_GET_DATA,
 	MorphoRequest_AddBaseRecord = ILV_ADD_RECORD,
     MorphoRequest_EraseBase     = ILV_ERASE_BASE,
+    MorphoRequest_DestroyBase   = ILV_DESTROY_DB,
+    MorphoRequest_CreateBase    = ILV_CREATE_DB,
 };
 
 #define DLE						0x1B

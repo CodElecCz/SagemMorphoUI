@@ -63,7 +63,8 @@ void MainWindow::openSerialPort()
     m_serial->setDataBits(p.dataBits);
     m_serial->setParity(p.parity);
     m_serial->setStopBits(p.stopBits);
-    m_serial->setFlowControl(p.flowControl);    
+    m_serial->setFlowControl(p.flowControl);
+
     if (m_serial->open(QIODevice::ReadWrite)) {
         m_console->setEnabled(true);
         m_console->setLocalEchoEnabled(p.localEchoEnabled);
@@ -89,6 +90,7 @@ void MainWindow::closeSerialPort()
 {
     if (m_serial->isOpen())
         m_serial->close();
+
     m_console->setEnabled(false);
     m_ui->actionConnect->setEnabled(true);
     m_ui->actionDisconnect->setEnabled(false);
@@ -141,6 +143,12 @@ void MainWindow::handleError(QSerialPort::SerialPortError error)
     }
 }
 
+void MainWindow::clearData()
+{
+    m_tx = 0;
+    m_rx = 0;
+}
+
 void MainWindow::initActionsConnections()
 {
     connect(m_ui->actionConnect, &QAction::triggered, this, &MainWindow::openSerialPort);
@@ -149,6 +157,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->actionQuit, &QAction::triggered, this, &MainWindow::close);
     connect(m_ui->actionConfigure, &QAction::triggered, m_settings, &SettingsDialog::show);
     connect(m_ui->actionClear, &QAction::triggered, m_console, &SagemMorpho::clear);
+    connect(m_ui->actionClear, &QAction::triggered, this, &MainWindow::clearData);
     connect(m_ui->actionAbout, &QAction::triggered, this, &MainWindow::about);
     connect(m_ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 

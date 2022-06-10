@@ -9,6 +9,8 @@ SOURCES += \
     Morpho/Ilv_errors.c \
     Morpho/morpho_add_base_record.c \
     Morpho/morpho_configure_uart.c \
+    Morpho/morpho_create_base.c \
+    Morpho/morpho_destroy_base.c \
     Morpho/morpho_erase_base.c \
     Morpho/morpho_get_base_config.c \
     Morpho/morpho_get_data.c \
@@ -27,7 +29,9 @@ HEADERS += \
     Morpho/Ilv_errors.h \
     Morpho/morpho_add_base_record.h \
     Morpho/morpho_configure_uart.h \
+    Morpho/morpho_create_base.h \
     Morpho/morpho_definitions.h \
+    Morpho/morpho_destroy_base.h \
     Morpho/morpho_erase_base.h \
     Morpho/morpho_get_base_config.h \
     Morpho/morpho_get_data.h \

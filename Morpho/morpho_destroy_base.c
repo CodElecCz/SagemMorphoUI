@@ -1,4 +1,4 @@
-#include "morpho_erase_base.h"
+#include "morpho_destroy_base.h"
 #include "morpho_definitions.h"
 #include "morpho_protocol.h"
 
@@ -12,14 +12,14 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_EraseBase_Request(uint8_t* packet, size_t* packetSize)
+void MORPHO_DestroyBase_Request(uint8_t* packet, size_t* packetSize)
 {
     uint8_t data[4];
     size_t dataSize = 0;
 
     //DATA 4b
 	//ILV - Identifier 1b/Length 2b/Value
-    data[dataSize++] = ILV_ERASE_BASE;
+    data[dataSize++] = ILV_DESTROY_DB;
     data[dataSize++] = sizeof(uint8_t);
     data[dataSize++] = 0;
     data[dataSize++] = 0;
@@ -30,7 +30,7 @@ void MORPHO_EraseBase_Request(uint8_t* packet, size_t* packetSize)
 }
 
 /*
-GetBaseConfig Response
+DestroyBase Response
 
 	NACK: 02 E4 00			- STX + ID + RC
 
@@ -46,7 +46,7 @@ GetBaseConfig Response
 	ACK:  02 62 00			- STX + ID + RC
 */
 
-int MORPHO_EraseBase_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus)
+int MORPHO_DestroyBase_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
