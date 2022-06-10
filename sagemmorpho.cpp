@@ -1,7 +1,7 @@
 #include "sagemmorpho.h"
 #include "console.h"
 
-#include "Morpho/morpho.h"
+#include "Morpho/morpho_protocol.h"
 #include "Morpho/morpho_get_descriptor.h"
 #include "Morpho/morpho_configure_uart.h"
 #include "Morpho/morpho_add_base_record.h"
@@ -29,7 +29,6 @@ SagemMorpho::~SagemMorpho()
     delete ui;
 }
 
-
 void SagemMorpho::putData(const QByteArray &data)
 {       
     //process response
@@ -56,9 +55,7 @@ void SagemMorpho::putData(const QByteArray &data)
             }
         }
 
-        //check data
-        uint8_t ilvErr = ILV_OK;
-        uint8_t ilvStatus = ILVSTS_OK;
+        //check data        
         uint8_t* value = NULL;
         size_t valueSize = 0;
 
@@ -67,6 +64,9 @@ void SagemMorpho::putData(const QByteArray &data)
         {
             return;
         }
+
+        uint8_t ilvErr = ILV_OK;
+        uint8_t ilvStatus = ILVSTS_OK;
 
         switch(m_request)
         {
@@ -128,11 +128,7 @@ void SagemMorpho::putData(const QByteArray &data)
             break;
         }
 
-        if(err==MORPHO_OK)
-        {
-
-        }
-        else
+        if(err != MORPHO_OK)
         {
             switch(err)
             {
@@ -157,16 +153,9 @@ void SagemMorpho::putData(const QByteArray &data)
 
         }
 
-        //ACK
-        uint8_t ack[4];
-        size_t ackSize = sizeof(data);
-        MORPHO_ResponseAck(ack, &ackSize);
+        ack();
 
-        QByteArray request;
-        request.append((char*)ack, ackSize);
-
-        ui->console->setDataHex(request);        
-
+        //repeat
         switch(m_request)
         {
         case MorphoRequest_AddBaseRecord:
@@ -331,6 +320,19 @@ void SagemMorpho::on_eraseBaseButton_clicked()
 
     QByteArray request;
     request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+void SagemMorpho::ack()
+{
+    //ACK
+    uint8_t ack[4];
+    size_t ackSize = sizeof(ack);
+    MORPHO_ResponseAck(ack, &ackSize);
+
+    QByteArray request;
+    request.append((char*)ack, ackSize);
 
     ui->console->setDataHex(request);
 }

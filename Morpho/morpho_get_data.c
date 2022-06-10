@@ -1,6 +1,6 @@
 #include "morpho_get_data.h"
 #include "morpho_definitions.h"
-#include "morpho.h"
+#include "morpho_protocol.h"
 
 #include "Ilv_definitions.h"
 #include "Ilv_crc.h"

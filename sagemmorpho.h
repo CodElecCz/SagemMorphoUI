@@ -34,15 +34,13 @@ public slots:
 
 private slots:
     void on_desciptorButton_clicked();
-
     void on_configUartButton_clicked();
-
     void on_addRecordButton_clicked();
-
     void on_eraseBaseButton_clicked();
 
 private:
     void addRecord(int userId);
+    void ack();
 
 private:
     Ui::SagemMorpho*        ui;

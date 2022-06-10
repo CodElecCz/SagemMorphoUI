@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Sagem MORPHO Terminal</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources/resource.qrc">
+    <normaloff>:/application.ico</normaloff>:/application.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout"/>
   </widget>
@@ -206,6 +210,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="resources/resource.qrc"/>
   <include location="morpho.qrc"/>
  </resources>
  <connections/>

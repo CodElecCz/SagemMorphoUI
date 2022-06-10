@@ -5,8 +5,8 @@
  *      Author: radomir.turca@codelec.cz
  */
 
-#ifndef INC_MORPHO_H_
-#define INC_MORPHO_H_
+#ifndef INC_MORPHO_PROTOCOL_H_
+#define INC_MORPHO_PROTOCOL_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -32,4 +32,4 @@ int MORPHO_ReceiveData(uint8_t *packet, size_t packetSize, uint8_t **value, size
 }
 #endif
 
-#endif /* INC_MORPHO_H_ */
+#endif /* INC_MORPHO_PROTOCOL_H_ */
