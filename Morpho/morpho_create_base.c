@@ -21,7 +21,7 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize)
     uint8_t maxNbOfFp = 2;
 
     uint32_t fieldSize = 2;
-    const char* fieldName[] = {"first", "last "}; //Field Name: String specifying the field name. The size of this string must be equal to 6.
+    const char* fieldName[] = {"First", "Last"}; //Field Name: String specifying the field name. The size of this string must be equal to 6.
 
 	//DATA
 	//ILV - Identifier 1b/Length 2b/Value
@@ -29,6 +29,7 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize)
     data[dataSize++] = 0;
     data[dataSize++] = 0;
     data[dataSize++] = 0;	//Database identifier
+    data[dataSize++] = 0;	//RFU
 
     data[dataSize++] = 0xff & maxNbOfRec;
     data[dataSize++] = 0xff & (maxNbOfRec >> 8);
@@ -48,8 +49,16 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize)
 
         memcpy(&data[dataSize], fieldName[i], strlen(fieldName[i]));
         dataSize += strlen(fieldName[i]);
-        data[dataSize++] = 0;
+
+        for(size_t j = strlen(fieldName[i]); j < 6; j++)
+            data[dataSize++] = 0;
 	}
+
+    //ILV - Identifier 1b/Length 2b/Value
+    data[dataSize++] = ID_BIO_ALGO_PARAM;			//Biometric Algorithm Parameter
+    data[dataSize++] = 1;
+    data[dataSize++] = 0;
+    data[dataSize++] = 0;
 
 	//recalculate size
     data[1] = 0xff & (dataSize - 3);

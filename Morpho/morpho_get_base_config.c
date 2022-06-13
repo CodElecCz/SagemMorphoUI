@@ -43,11 +43,12 @@ GetBaseConfig Response
 		F4 01 00 00			- Max record number (500)
 		04 00 00 00 		- Current Record Number
 		F0 01 00 00			- Free Record Number
-		02 00 00 00			- Number of Fields
-		1B
+		02 00 00 00			- Number of Fields		
 		12 0C 00 ...		- ILV: ID_TIMESTAMP,  Length value 0x000C
-		0F 08 00 ...		- ILV: ID_PUBLIC_FIELD, Length value 0x0008, Field size 2 bytes, Field name 6 bytes
-		...
+        0F 08 00 0f 00 ...	- ILV: ID_PUBLIC_FIELD, Length value 0x0008, Field size 2 bytes, Field name 6 bytes
+        46 69 72 73 74 00   - First
+        4c 61 73 74 00 00   - Last
+        38 01 00 00         - ILV: Biometric Algorithm Param 00 - regular, 01 - norm
 
 		5C D5 1B 03			- CrcL + CrcH + DLE + ETX
 
