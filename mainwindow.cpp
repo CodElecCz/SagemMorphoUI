@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->action_BDR1->setEnabled(false);
     m_ui->action_SAG0->setEnabled(false);
     m_ui->action_SAG1->setEnabled(false);
+    m_ui->action_TRACE->setEnabled(false);
 
     m_ui->statusBar->addWidget(m_status);
 
@@ -76,6 +77,8 @@ void MainWindow::openSerialPort()
         m_ui->action_BDR1->setEnabled(true);
         m_ui->action_SAG0->setEnabled(true);
         m_ui->action_SAG1->setEnabled(true);
+        m_ui->action_TRACE->setEnabled(true);
+
         showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                           .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
                           .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
@@ -100,6 +103,7 @@ void MainWindow::closeSerialPort()
     m_ui->action_BDR1->setEnabled(false);
     m_ui->action_SAG0->setEnabled(false);
     m_ui->action_SAG1->setEnabled(false);
+    m_ui->action_TRACE->setEnabled(false);
 
     showStatusMessage(tr("Disconnected"));
 }
@@ -165,6 +169,7 @@ void MainWindow::initActionsConnections()
     connect(m_ui->action_SAG1, &QAction::triggered, m_console, &SagemMorpho::sendSag1);
     connect(m_ui->action_BDR0, &QAction::triggered, m_console, &SagemMorpho::sendBdr0);
     connect(m_ui->action_BDR1, &QAction::triggered, m_console, &SagemMorpho::sendBdr1);
+    connect(m_ui->action_TRACE, &QAction::triggered, m_console, &SagemMorpho::sendTrace);
 }
 
 void MainWindow::showStatusMessage(const QString &message)

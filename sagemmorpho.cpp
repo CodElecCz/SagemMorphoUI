@@ -37,11 +37,14 @@ void SagemMorpho::putData(const QByteArray &data)
     if( m_request != MorphoRequest_None)
     {
         //ui->console->putDataHex(data, false);
+        //ui->console->putData(data, false);
 
         //data
         m_response.append(data);       
-        size_t packetSize = m_response.length();
-        uint8_t packet[2048];
+        size_t responseSize = m_response.length();
+
+        uint8_t packet[10*1024];
+        size_t packetSize = (responseSize < sizeof(packet))? responseSize : sizeof(packet);
         memcpy(packet, m_response.data(), packetSize);
 
         //check ack-nack
@@ -245,6 +248,13 @@ void SagemMorpho::sendBdr1()
     m_request = MorphoRequest_None;
 
     ui->console->setData("$BDR01\r\n");
+}
+
+void SagemMorpho::sendTrace()
+{
+    m_request = MorphoRequest_None;
+
+    ui->console->setData("$TRACE\r\n");
 }
 
 void SagemMorpho::on_desciptorButton_clicked()

@@ -31,6 +31,7 @@ public slots:
     void sendSag1();
     void sendBdr0();
     void sendBdr1();
+    void sendTrace();
 
 private slots:
     void on_desciptorButton_clicked();

@@ -74,6 +74,8 @@
    <addaction name="actionBreak"/>
    <addaction name="action_BDR0"/>
    <addaction name="action_BDR1"/>
+   <addaction name="separator"/>
+   <addaction name="action_TRACE"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAbout">
@@ -207,11 +209,19 @@
     <string>Baudrate 115200</string>
    </property>
   </action>
+  <action name="action_TRACE">
+   <property name="text">
+    <string>$TRACE</string>
+   </property>
+   <property name="toolTip">
+    <string>Trace statistic</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="resources/resource.qrc"/>
   <include location="morpho.qrc"/>
+  <include location="resources/resource.qrc"/>
  </resources>
  <connections/>
 </ui>
