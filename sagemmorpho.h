@@ -21,6 +21,12 @@ public:
 
     void sendBreak();
 
+    enum ReceiveState
+    {
+        ReceiveState_ReciveSOP = 0,
+        ReceiveState_ReciveData = 1
+    };
+
 signals:
     void getData(const QByteArray &data);
 
@@ -40,19 +46,25 @@ private slots:
     void on_eraseBaseButton_clicked();
     void on_destroyBaseButton_clicked();
     void on_createBaseButton_clicked();
-
     void on_getBaseConfigButton_clicked();
+    void on_identifyButton_clicked();
+    void on_cancelButton_clicked();
 
 private:
     void addRecord(int userId);
     void ack();
 
+    void receiveSOP();
+    void receiveData();
+
 private:
     Ui::SagemMorpho*        ui;
     enum MorphoRequest		m_request;
+    enum MorphoRequest		m_requestCancel;
     QByteArray              m_response;
     int                     m_userId;
     int                     m_repeat;
+    ReceiveState            m_receiveState;
 };
 
 #endif // SAGEMMORPHO_H

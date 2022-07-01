@@ -8,6 +8,7 @@ SOURCES += \
     Morpho/Ilv_crc.c \
     Morpho/Ilv_errors.c \
     Morpho/morpho_add_base_record.c \
+    Morpho/morpho_cancel.c \
     Morpho/morpho_configure_uart.c \
     Morpho/morpho_create_base.c \
     Morpho/morpho_destroy_base.c \
@@ -15,6 +16,7 @@ SOURCES += \
     Morpho/morpho_get_base_config.c \
     Morpho/morpho_get_data.c \
     Morpho/morpho_get_descriptor.c \
+    Morpho/morpho_identify.c \
     Morpho/morpho_protocol.c \
     main.cpp \
     mainwindow.cpp \
@@ -28,6 +30,7 @@ HEADERS += \
     Morpho/Ilv_definitions.h \
     Morpho/Ilv_errors.h \
     Morpho/morpho_add_base_record.h \
+    Morpho/morpho_cancel.h \
     Morpho/morpho_configure_uart.h \
     Morpho/morpho_create_base.h \
     Morpho/morpho_definitions.h \
@@ -36,6 +39,7 @@ HEADERS += \
     Morpho/morpho_get_base_config.h \
     Morpho/morpho_get_data.h \
     Morpho/morpho_get_descriptor.h \
+    Morpho/morpho_identify.h \
     Morpho/morpho_protocol.h \
     mainwindow.h \
     sagemmorpho.h \

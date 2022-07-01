@@ -25,6 +25,8 @@ enum MorphoRequest
     MorphoRequest_EraseBase     = ILV_ERASE_BASE,
     MorphoRequest_DestroyBase   = ILV_DESTROY_DB,
     MorphoRequest_CreateBase    = ILV_CREATE_DB,
+    MorphoRequest_Identify      = ILV_IDENTIFY,
+    MorphoRequest_Cancel        = ILV_CANCEL
 };
 
 #define DLE						0x1B

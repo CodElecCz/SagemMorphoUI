@@ -42,7 +42,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="verticalLayoutWidget_2">
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
         <widget class="QToolBox" name="toolBox">
          <property name="sizePolicy">
@@ -59,7 +59,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -110,20 +110,65 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
           <attribute name="label">
            <string>Biometric</string>
           </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QPushButton" name="identifyButton">
+               <property name="minimumSize">
+                <size>
+                 <width>140</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Identify [0x22]</string>
+               </property>
+              </widget>
+             </item>
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QPushButton" name="cancelButton">
+               <property name="minimumSize">
+                <size>
+                 <width>140</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Cancel [0x70]</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="page_3">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -270,7 +315,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -283,7 +328,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -296,7 +341,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -309,7 +354,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>
@@ -322,7 +367,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>344</width>
+            <width>320</width>
             <height>285</height>
            </rect>
           </property>

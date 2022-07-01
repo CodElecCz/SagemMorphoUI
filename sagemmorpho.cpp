@@ -10,6 +10,8 @@
 #include "Morpho/morpho_erase_base.h"
 #include "Morpho/morpho_destroy_base.h"
 #include "Morpho/morpho_create_base.h"
+#include "Morpho/morpho_identify.h"
+#include "Morpho/morpho_cancel.h"
 #include "Morpho/Ilv_errors.h"
 
 #include "ui_sagemmorpho.h"
@@ -18,8 +20,10 @@ SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SagemMorpho),
     m_request(MorphoRequest_None),
+    m_requestCancel(MorphoRequest_None),
     m_userId(1),
-    m_repeat(1)
+    m_repeat(1),
+    m_receiveState(ReceiveState_ReciveSOP)
 {
     ui->setupUi(this);
 
@@ -31,52 +35,87 @@ SagemMorpho::~SagemMorpho()
     delete ui;
 }
 
-void SagemMorpho::putData(const QByteArray &data)
-{       
-    //process response
-    if( m_request != MorphoRequest_None)
+void SagemMorpho::receiveSOP()
+{
+    size_t responseSize = m_response.length();
+    uint8_t packet[128];
+    size_t packetSize = (responseSize < sizeof(packet))? responseSize : sizeof(packet);
+
+    memset(packet, 0, sizeof(packet));
+    memcpy(packet, m_response.data(), packetSize);
+
+    //check ack-nack
+    size_t sopSize = 0;
+    uint8_t rc = 0;
+    int err = MORPHO_ReciveSOP(packet, packetSize, &rc, &sopSize);
+    if(err != MORPHO_OK)
     {
-        //ui->console->putDataHex(data, false);
-        //ui->console->putData(data, false);
-
-        //data
-        m_response.append(data);       
-        size_t responseSize = m_response.length();
-
-        uint8_t packet[10*1024];
-        size_t packetSize = (responseSize < sizeof(packet))? responseSize : sizeof(packet);
-        memcpy(packet, m_response.data(), packetSize);
-
-        //check ack-nack
-        size_t sopSize = 0;
-        uint8_t rc = 0;
-        int err = MORPHO_ReciveSOP(packet, packetSize, &rc, &sopSize);
-        if(err != MORPHO_OK)
+        if(err == MORPHO_ERR_RESPONSE_NACK)
         {
-            if(err == MORPHO_ERR_RESPONSE_NACK)
-            {
-                m_request = MorphoRequest_None;
-                return;
-            }
-        }
+            ui->console->putDataHex(m_response);
 
-        //check data        
-        uint8_t* value = NULL;
-        size_t valueSize = 0;
-
-        err = MORPHO_ReceiveData(&packet[sopSize], (packetSize - sopSize), &value, &valueSize);
-        if(err != MORPHO_OK)
-        {
+            m_request = MorphoRequest_None;
             return;
         }
+    }
+    else if(err == MORPHO_OK)
+    {
+        ui->console->putDataHex(m_response.mid(0, sopSize));
+        m_response.remove(0, sopSize);
 
-        uint8_t ilvErr = ILV_OK;
-        uint8_t ilvStatus = ILVSTS_OK;
-
+        //no data
         switch(m_request)
         {
-        case MorphoRequest_GetDescriptor:
+        case MorphoRequest_Cancel:
+            //Asynchronous messages are managed for all live-finger acquisition functions: Enroll, Verify, and Identify.
+            switch(m_requestCancel)
             {
+            case MorphoRequest_Identify:
+                m_request = m_requestCancel;
+                m_requestCancel = MorphoRequest_None;
+
+                //receive data of aborted command
+                m_receiveState = ReceiveState_ReciveData;
+                break;
+            default:
+                m_request = MorphoRequest_None;
+                m_requestCancel = MorphoRequest_None;
+                break;
+            }
+            return;
+        default:
+            m_receiveState = ReceiveState_ReciveData;
+            return;
+        }
+    }
+}
+
+void SagemMorpho::receiveData()
+{
+    size_t responseSize = m_response.length();
+    uint8_t packet[10*1024];
+    size_t packetSize = (responseSize < sizeof(packet))? responseSize : sizeof(packet);
+
+    memset(packet, 0, sizeof(packet));
+    memcpy(packet, m_response.data(), packetSize);
+
+    //check data
+    uint8_t* value = NULL;
+    size_t valueSize = 0;
+
+    int err = MORPHO_ReceiveData(packet, packetSize, &value, &valueSize);
+    if(err != MORPHO_OK)
+    {
+        return;
+    }
+
+    uint8_t ilvErr = ILV_OK;
+    uint8_t ilvStatus = ILVSTS_OK;
+
+    switch(m_request)
+    {
+    case MorphoRequest_GetDescriptor:
+        {
             const char* product = NULL;
             const char* sensor = NULL;
             const char* software = NULL;
@@ -90,110 +129,160 @@ void SagemMorpho::putData(const QByteArray &data)
                 ui->console->putData(software, false);
 
             ui->console->putDataRaw("\r\n");
+        }
+        break;
+    case MorphoRequest_GetBaseConfig:
+        {
+            err = MORPHO_GetBaseConfig_Response(value, valueSize, &ilvErr);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_AddBaseRecord:
+        {
+            uint8_t baseStatus = 0;
+            uint32_t userIndex = 0;
+
+            err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_GetData:
+        {
+            const char* userData = NULL;
+            err = MORPHO_GetData_Response(value, valueSize, &ilvErr, &userData);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_ConfigureUart:
+        {
+            err = MORPHO_ConfigureUart_Response(value, valueSize, &ilvErr);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_EraseBase:
+        {
+            err = MORPHO_EraseBase_Response(value, valueSize, &ilvErr);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_DestroyBase:
+        {
+            err = MORPHO_DestroyBase_Response(value, valueSize, &ilvErr);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_CreateBase:
+        {
+            err = MORPHO_CreateBase_Response(value, valueSize, &ilvErr);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_Identify:
+        {
+            uint32_t userIndex = 0;
+            const char* userId = NULL;
+
+            err = MORPHO_Identify_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex, &userId);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    default:
+        break;
+    }
+
+    if(err != MORPHO_OK)
+    {
+        switch(err)
+        {
+        case MORPHO_WARN_VAL_ILV_ERROR:
+            {
+                QString ilv = QStringLiteral("0x%1").arg(ilvErr, 2, 16, QLatin1Char('0'));
+                QString stat = QString("ILV err [%1] - %2\r\n").arg(ilv).arg(QString((const char*)IlvConvertError(ilvErr)));
+                ui->console->putDataRaw(stat.toUtf8());
             }
             break;
-        case MorphoRequest_GetBaseConfig:
+        case MORPHO_WARN_VAL_ILV_STATUS:
             {
-                err = MORPHO_GetBaseConfig_Response(value, valueSize, &ilvErr);
-
-                ui->console->putDataHex(m_response);
-            }
-            break;
-        case MorphoRequest_AddBaseRecord:
-            {
-                uint8_t baseStatus = 0;
-                uint32_t userIndex = 0;
-
-                err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);
-
-                ui->console->putDataHex(m_response);
-            }
-            break;
-        case MorphoRequest_GetData:
-            {
-                const char* userData = NULL;
-                err = MORPHO_GetData_Response(value, valueSize, &ilvErr, &userData);
-
-                ui->console->putDataHex(m_response);
-            }
-            break;
-        case MorphoRequest_ConfigureUart:
-            {
-                err = MORPHO_ConfigureUart_Response(value, valueSize, &ilvErr);
-
-                ui->console->putDataHex(m_response);
-            }
-            break;
-        case MorphoRequest_EraseBase:
-            {
-                err = MORPHO_EraseBase_Response(value, valueSize, &ilvErr);
-
-                ui->console->putDataHex(m_response);
-            }
-            break;
-        case MorphoRequest_DestroyBase:
-            {
-                err = MORPHO_DestroyBase_Response(value, valueSize, &ilvErr);
-
-                ui->console->putDataHex(m_response);
-            }
-            break;
-        case MorphoRequest_CreateBase:
-            {
-                err = MORPHO_CreateBase_Response(value, valueSize, &ilvErr);
-
-                ui->console->putDataHex(m_response);
+                QString ilv = QStringLiteral("0x%1").arg(ilvStatus, 2, 16, QLatin1Char('0'));
+                QString stat = QString("ILV status [%1] - %2\r\n").arg(ilv).arg(QString((const char*)IlvConvertStatus(ilvStatus)));
+                ui->console->putDataRaw(stat.toUtf8());
             }
             break;
         default:
+
             break;
         }
 
-        if(err != MORPHO_OK)
+    }
+
+    ack();
+
+    //repeat
+    switch(m_request)
+    {
+    case MorphoRequest_AddBaseRecord:
+        m_repeat--;
+        if(m_repeat > 0)
         {
-            switch(err)
-            {
-            case MORPHO_WARN_VAL_ILV_ERROR:
-                {
-                    QString ilv = QStringLiteral("0x%1").arg(ilvErr, 2, 16, QLatin1Char('0'));
-                    QString stat = QString("ILV err [%1] - %2\r\n").arg(ilv).arg(QString((const char*)IlvConvertError(ilvErr)));
-                    ui->console->putDataRaw(stat.toUtf8());
-                }
-                break;
-            case MORPHO_WARN_VAL_ILV_STATUS:
-                {
-                    QString ilv = QStringLiteral("0x%1").arg(ilvStatus, 2, 16, QLatin1Char('0'));
-                    QString stat = QString("ILV status [%1] - %2\r\n").arg(ilv).arg(QString((const char*)IlvConvertStatus(ilvStatus)));
-                    ui->console->putDataRaw(stat.toUtf8());
-                }
-                break;
-            default:
-
-                break;
-            }
-
+            addRecord(++m_userId);
         }
-
-        ack();
-
-        //repeat
-        switch(m_request)
+        else
         {
-        case MorphoRequest_AddBaseRecord:
-            m_repeat--;
-            if(m_repeat > 0)
-            {
-                addRecord(++m_userId);
-            }
-            else
-            {
-                m_repeat = 1;
-                m_request = MorphoRequest_None;
-            }
-            break;
-        default:
             m_repeat = 1;
             m_request = MorphoRequest_None;
+        }
+        break;
+    default:
+        m_repeat = 1;
+        m_request = MorphoRequest_None;
+        break;
+    }
+}
+
+void SagemMorpho::ack()
+{
+    //ACK
+    uint8_t ack[4];
+    size_t ackSize = sizeof(ack);
+    MORPHO_ResponseAck(ack, &ackSize);
+
+    QByteArray request;
+    request.append((char*)ack, ackSize);
+
+    ui->console->setDataHex(request);
+}
+
+void SagemMorpho::putData(const QByteArray &data)
+{       
+    //process response
+    if( m_request != MorphoRequest_None)
+    {        
+        //data
+        m_response.append(data);       
+
+        switch(m_receiveState)
+        {
+        case ReceiveState_ReciveSOP:
+            receiveSOP();
+
+            //check if data
+            if(m_receiveState == ReceiveState_ReciveData)
+            {
+                receiveData();
+            }
+            break;
+        case ReceiveState_ReciveData:
+            //ui->console->putDataHex(data, false);
+            //ui->console->putData(data, false);
+            receiveData();
             break;
         }
     }
@@ -260,6 +349,7 @@ void SagemMorpho::sendTrace()
 void SagemMorpho::on_desciptorButton_clicked()
 {
     m_request = MorphoRequest_GetDescriptor;
+    m_receiveState = ReceiveState_ReciveSOP;
 
     m_response.clear();
 
@@ -277,6 +367,7 @@ void SagemMorpho::on_desciptorButton_clicked()
 void SagemMorpho::on_configUartButton_clicked()
 {
     m_request = MorphoRequest_ConfigureUart;
+    m_receiveState = ReceiveState_ReciveSOP;
 
     m_response.clear();
 
@@ -314,6 +405,7 @@ void SagemMorpho::on_addRecordButton_clicked()
 void SagemMorpho::addRecord(int userId)
 {
     m_request = MorphoRequest_AddBaseRecord;
+    m_receiveState = ReceiveState_ReciveSOP;
 
     m_response.clear();
 
@@ -339,6 +431,7 @@ void SagemMorpho::addRecord(int userId)
 void SagemMorpho::on_eraseBaseButton_clicked()
 {
     m_request = MorphoRequest_EraseBase;
+    m_receiveState = ReceiveState_ReciveSOP;
 
     m_response.clear();
 
@@ -352,23 +445,10 @@ void SagemMorpho::on_eraseBaseButton_clicked()
     ui->console->setDataHex(request);
 }
 
-void SagemMorpho::ack()
-{
-    //ACK
-    uint8_t ack[4];
-    size_t ackSize = sizeof(ack);
-    MORPHO_ResponseAck(ack, &ackSize);
-
-    QByteArray request;
-    request.append((char*)ack, ackSize);
-
-    ui->console->setDataHex(request);
-}
-
-
 void SagemMorpho::on_destroyBaseButton_clicked()
 {
     m_request = MorphoRequest_DestroyBase;
+    m_receiveState = ReceiveState_ReciveSOP;
 
     m_response.clear();
 
@@ -385,6 +465,7 @@ void SagemMorpho::on_destroyBaseButton_clicked()
 void SagemMorpho::on_createBaseButton_clicked()
 {
     m_request = MorphoRequest_CreateBase;
+    m_receiveState = ReceiveState_ReciveSOP;
 
     m_response.clear();
 
@@ -402,12 +483,52 @@ void SagemMorpho::on_createBaseButton_clicked()
 void SagemMorpho::on_getBaseConfigButton_clicked()
 {
     m_request = MorphoRequest_GetBaseConfig;
+    m_receiveState = ReceiveState_ReciveSOP;
 
     m_response.clear();
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
     MORPHO_GetBaseConfig_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+
+void SagemMorpho::on_identifyButton_clicked()
+{
+    m_request = MorphoRequest_Identify;
+    m_receiveState = ReceiveState_ReciveSOP;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_Identify_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+
+void SagemMorpho::on_cancelButton_clicked()
+{
+    //store formal request
+    m_requestCancel = m_request;
+
+    m_request = MorphoRequest_Cancel;
+    m_receiveState = ReceiveState_ReciveSOP;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_Cancel_Request(data, &dataSize);
 
     QByteArray request;
     request.append((char*)data, dataSize);
