@@ -23,7 +23,7 @@ SagemMorpho::SagemMorpho(QWidget *parent) :
     m_requestCancel(MorphoRequest_None),
     m_userId(1),
     m_repeat(1),
-    m_receiveState(ReceiveState_ReciveSOP)
+    m_receiveState(ReceiveState_ReceiveSOP)
 {
     ui->setupUi(this);
 
@@ -75,7 +75,7 @@ void SagemMorpho::receiveSOP()
                 m_requestCancel = MorphoRequest_None;
 
                 //receive data of aborted command
-                m_receiveState = ReceiveState_ReciveData;
+                m_receiveState = ReceiveState_ReceiveData;
                 break;
             default:
                 m_request = MorphoRequest_None;
@@ -84,7 +84,7 @@ void SagemMorpho::receiveSOP()
             }
             return;
         default:
-            m_receiveState = ReceiveState_ReciveData;
+            m_receiveState = ReceiveState_ReceiveData;
             return;
         }
     }
@@ -270,16 +270,16 @@ void SagemMorpho::putData(const QByteArray &data)
 
         switch(m_receiveState)
         {
-        case ReceiveState_ReciveSOP:
+        case ReceiveState_ReceiveSOP:
             receiveSOP();
 
             //check if data
-            if(m_receiveState == ReceiveState_ReciveData)
+            if(m_receiveState == ReceiveState_ReceiveData)
             {
                 receiveData();
             }
             break;
-        case ReceiveState_ReciveData:
+        case ReceiveState_ReceiveData:
             //ui->console->putDataHex(data, false);
             //ui->console->putData(data, false);
             receiveData();
@@ -349,7 +349,7 @@ void SagemMorpho::sendTrace()
 void SagemMorpho::on_desciptorButton_clicked()
 {
     m_request = MorphoRequest_GetDescriptor;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -367,7 +367,7 @@ void SagemMorpho::on_desciptorButton_clicked()
 void SagemMorpho::on_configUartButton_clicked()
 {
     m_request = MorphoRequest_ConfigureUart;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -405,7 +405,7 @@ void SagemMorpho::on_addRecordButton_clicked()
 void SagemMorpho::addRecord(int userId)
 {
     m_request = MorphoRequest_AddBaseRecord;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -431,7 +431,7 @@ void SagemMorpho::addRecord(int userId)
 void SagemMorpho::on_eraseBaseButton_clicked()
 {
     m_request = MorphoRequest_EraseBase;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -448,7 +448,7 @@ void SagemMorpho::on_eraseBaseButton_clicked()
 void SagemMorpho::on_destroyBaseButton_clicked()
 {
     m_request = MorphoRequest_DestroyBase;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -465,7 +465,7 @@ void SagemMorpho::on_destroyBaseButton_clicked()
 void SagemMorpho::on_createBaseButton_clicked()
 {
     m_request = MorphoRequest_CreateBase;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -483,7 +483,7 @@ void SagemMorpho::on_createBaseButton_clicked()
 void SagemMorpho::on_getBaseConfigButton_clicked()
 {
     m_request = MorphoRequest_GetBaseConfig;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -501,7 +501,7 @@ void SagemMorpho::on_getBaseConfigButton_clicked()
 void SagemMorpho::on_identifyButton_clicked()
 {
     m_request = MorphoRequest_Identify;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 
@@ -522,7 +522,7 @@ void SagemMorpho::on_cancelButton_clicked()
     m_requestCancel = m_request;
 
     m_request = MorphoRequest_Cancel;
-    m_receiveState = ReceiveState_ReciveSOP;
+    m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
 

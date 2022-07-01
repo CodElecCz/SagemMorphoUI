@@ -23,8 +23,8 @@ public:
 
     enum ReceiveState
     {
-        ReceiveState_ReciveSOP = 0,
-        ReceiveState_ReciveData = 1
+        ReceiveState_ReceiveSOP = 0,
+        ReceiveState_ReceiveData = 1
     };
 
 signals:
