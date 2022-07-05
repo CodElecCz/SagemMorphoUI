@@ -92,11 +92,11 @@ int MORPHO_Identify_Response(const uint8_t* value, size_t valueSize, uint8_t* il
                     *userIndex = value[2] + (value[3] << 8) + (value[4] << 16) + (value[5] << 24);
             }
 
-            if(valueSize > 8 && value[6] == ID_USER_ID)
+            if(valueSize > 9 && value[6] == ID_USER_ID)
             {
-                uint8_t length = value[7];
+                uint8_t length = value[7] + (value[8] << 8);
                 if(userId)
-                    *userId = (const char*)&value[8];
+                    *userId = (const char*)&value[9];
             }
         }
 	}
