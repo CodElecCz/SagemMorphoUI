@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize);
+void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize, uint16_t timeout, uint16_t threshold);
 int MORPHO_Identify_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus, uint8_t *baseStatus, uint32_t* userIndex, const char** userId);
 
 #ifdef __cplusplus

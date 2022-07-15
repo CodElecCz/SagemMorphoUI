@@ -195,6 +195,12 @@ void SagemMorpho::receiveData()
         }
         break;
     default:
+        {
+            ui->console->putDataHex(m_response);
+
+            QString stat = QString("unexpected data\r\n");
+            ui->console->putDataRaw(stat.toUtf8());
+        }
         break;
     }
 
@@ -290,16 +296,20 @@ void SagemMorpho::putData(const QByteArray &data)
     {
         if(data.at(0) == 0x02)
         {
-            ui->console->putDataHex(data);
-
             //unexpected data
             if(data.size() > 3 &&
-                    (uint8_t)data.at(1) == 0xE1 &&
-                    (uint8_t)data.at(data.size()-1) == 0x03)
+                    (uint8_t)data.at(0) == STX &&
+                    (uint8_t)data.at(1) == 0xE1 && //data packet
+                    (uint8_t)data.at(data.size() - 1) == ETX)
             {
-                QString stat = QString("unexpected data\r\n");
-                ui->console->putDataRaw(stat.toUtf8());
-                ack();
+                //data
+                m_response.append(data);
+
+                receiveData();
+            }
+            else
+            {
+                ui->console->putDataHex(data);
             }
         }
         else
@@ -574,7 +584,7 @@ void SagemMorpho::on_identifyButton_clicked()
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
-    MORPHO_Identify_Request(data, &dataSize);
+    MORPHO_Identify_Request(data, &dataSize, 0, 5);
 
     QByteArray request;
     request.append((char*)data, dataSize);

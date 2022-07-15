@@ -12,13 +12,10 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize)
+void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize, uint16_t timeout, uint16_t threshold)
 {
     uint8_t data[9];
     size_t dataSize = 0;
-
-    uint16_t timeout = 0;
-    uint16_t threshold = 5;
 
 	//DATA
 	//ILV - Identifier 1b/Length 2b/Value
