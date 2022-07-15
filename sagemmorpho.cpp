@@ -288,8 +288,20 @@ void SagemMorpho::putData(const QByteArray &data)
     }
     else
     {
-        if(data.at(0) < 0x020 || data.at(0) > 0x7A)
+        if(data.at(0) == 0x02)
+        {
             ui->console->putDataHex(data);
+
+            //unexpected data
+            if(data.size() > 3 &&
+                    (uint8_t)data.at(1) == 0xE1 &&
+                    (uint8_t)data.at(data.size()-1) == 0x03)
+            {
+                QString stat = QString("unexpected data\r\n");
+                ui->console->putDataRaw(stat.toUtf8());
+                ack();
+            }
+        }
         else
             ui->console->putData(data);
     }

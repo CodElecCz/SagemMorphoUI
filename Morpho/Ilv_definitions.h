@@ -129,7 +129,6 @@
 #define ILVERR_NO_HIT                   0xE3    ///< Presented finger does not match
 #define ILVERR_FFD                      0xDB    ///< False finger detected
 #define ILVERR_MOIST_FINGER             0xDA    ///< Too moist finger detected
-
 #define ILVERR_NOT_IMPLEMENTED          0x9D    ///< The request is not yet implemented.
 
 /*!
@@ -146,9 +145,8 @@
 #define ILVSTS_ACTIVATED                8       ///< The MorphoModule is activated
 #define ILVSTS_NOTACTIVATED             9       ///< The MorphoModule is not activated
 #define ILVSTS_DB_KO                    10      ///< The flash can not be accessed
-
-#define ILVSTS_FFD			0x22    ///< False finger detected
-#define ILVSTS_MOIST_FINGER		0x23    ///< Too moist finger detected
+#define ILVSTS_FFD                      0x22    ///< False finger detected
+#define ILVSTS_MOIST_FINGER             0x23    ///< Too moist finger detected
 
 #endif /*__ILV_DEFINITIONS_H*/
 
