@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>579</width>
+    <width>777</width>
     <height>500</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>579</width>
+     <width>777</width>
      <height>22</height>
     </rect>
    </property>
@@ -76,6 +76,11 @@
    <addaction name="action_BDR1"/>
    <addaction name="separator"/>
    <addaction name="action_TRACE"/>
+   <addaction name="separator"/>
+   <addaction name="action_IDF0"/>
+   <addaction name="action_IDF1"/>
+   <addaction name="action_IDC0"/>
+   <addaction name="action_IDC1"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionAbout">
@@ -217,11 +222,43 @@
     <string>Trace statistic</string>
    </property>
   </action>
+  <action name="action_IDF0">
+   <property name="text">
+    <string>$IDF0</string>
+   </property>
+   <property name="toolTip">
+    <string>IDENTIFY</string>
+   </property>
+  </action>
+  <action name="action_IDC0">
+   <property name="text">
+    <string>$IDC0</string>
+   </property>
+   <property name="toolTip">
+    <string>CANCEL</string>
+   </property>
+  </action>
+  <action name="action_IDF1">
+   <property name="text">
+    <string>$IDF1</string>
+   </property>
+   <property name="toolTip">
+    <string>IDENTIFY</string>
+   </property>
+  </action>
+  <action name="action_IDC1">
+   <property name="text">
+    <string>$IDC1</string>
+   </property>
+   <property name="toolTip">
+    <string>CANCEL</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="morpho.qrc"/>
   <include location="resources/resource.qrc"/>
+  <include location="morpho.qrc"/>
  </resources>
  <connections/>
 </ui>

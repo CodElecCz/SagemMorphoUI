@@ -35,6 +35,10 @@ MainWindow::MainWindow(QWidget *parent) :
     m_ui->action_SAG0->setEnabled(false);
     m_ui->action_SAG1->setEnabled(false);
     m_ui->action_TRACE->setEnabled(false);
+    m_ui->action_IDC0->setEnabled(false);
+    m_ui->action_IDF0->setEnabled(false);
+    m_ui->action_IDC1->setEnabled(false);
+    m_ui->action_IDF1->setEnabled(false);
 
     m_ui->statusBar->addWidget(m_status);
 
@@ -78,6 +82,10 @@ void MainWindow::openSerialPort()
         m_ui->action_SAG0->setEnabled(true);
         m_ui->action_SAG1->setEnabled(true);
         m_ui->action_TRACE->setEnabled(true);
+        m_ui->action_IDC0->setEnabled(true);
+        m_ui->action_IDF0->setEnabled(true);
+        m_ui->action_IDC1->setEnabled(true);
+        m_ui->action_IDF1->setEnabled(true);
 
         showStatusMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
                           .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
@@ -104,6 +112,10 @@ void MainWindow::closeSerialPort()
     m_ui->action_SAG0->setEnabled(false);
     m_ui->action_SAG1->setEnabled(false);
     m_ui->action_TRACE->setEnabled(false);
+    m_ui->action_IDC0->setEnabled(false);
+    m_ui->action_IDF0->setEnabled(false);
+    m_ui->action_IDC1->setEnabled(false);
+    m_ui->action_IDF1->setEnabled(false);
 
     showStatusMessage(tr("Disconnected"));
 }
@@ -170,6 +182,10 @@ void MainWindow::initActionsConnections()
     connect(m_ui->action_BDR0, &QAction::triggered, m_console, &SagemMorpho::sendBdr0);
     connect(m_ui->action_BDR1, &QAction::triggered, m_console, &SagemMorpho::sendBdr1);
     connect(m_ui->action_TRACE, &QAction::triggered, m_console, &SagemMorpho::sendTrace);
+    connect(m_ui->action_IDF0, &QAction::triggered, m_console, &SagemMorpho::sendIdentify0);
+    connect(m_ui->action_IDC0, &QAction::triggered, m_console, &SagemMorpho::sendCancel0);
+    connect(m_ui->action_IDF1, &QAction::triggered, m_console, &SagemMorpho::sendIdentify1);
+    connect(m_ui->action_IDC1, &QAction::triggered, m_console, &SagemMorpho::sendCancel1);
 }
 
 void MainWindow::showStatusMessage(const QString &message)

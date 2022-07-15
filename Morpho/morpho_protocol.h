@@ -16,8 +16,10 @@ extern "C" {
 #endif
 
 void MORPHO_ResetCounter(void);
-void MORPHO_ResponseAck(const uint8_t* packet, size_t* packetSize);
-void MORPHO_ResponseNack(const uint8_t* packet, size_t* packetSize);
+void MORPHO_SetCounter(uint8_t requestCounter);
+uint8_t MORPHO_GetCounter(void);
+void MORPHO_ResponseAck(uint8_t* packet, size_t* packetSize);
+void MORPHO_ResponseNack(uint8_t* packet, size_t* packetSize);
 
 //request
 void MORPHO_MakeSOP(uint8_t Type, uint8_t First, uint8_t Last, uint8_t RC, uint8_t* PacketToSend, size_t* PacketCurrentSize);

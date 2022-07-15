@@ -23,13 +23,23 @@ void MORPHO_ResetCounter(void)
     ResponseCounter = 0;
 }
 
-void MORPHO_ResponseAck(const uint8_t* packet, size_t* packetSize)
+void MORPHO_SetCounter(uint8_t requestCounter)
+{
+	RequestCounter = requestCounter;
+}
+
+uint8_t MORPHO_GetCounter(void)
+{
+    return RequestCounter;
+}
+
+void MORPHO_ResponseAck(uint8_t* packet, size_t* packetSize)
 {
     MORPHO_MakeSOP(PACKED_ID_TYPE_ACK, 1, 1, ResponseCounter, packet, packetSize);
     //RequestCounter += 1;
 }
 
-void MORPHO_ResponseNack(const uint8_t* packet, size_t* packetSize)
+void MORPHO_ResponseNack(uint8_t* packet, size_t* packetSize)
 {
     MORPHO_MakeSOP(PACKED_ID_TYPE_NACK, 1, 1, ResponseCounter, packet, packetSize);
     //RequestCounter += 1;
@@ -189,7 +199,7 @@ int MORPHO_ReciveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size
     if(packet[0] != STX)
 		return MORPHO_ERR_RESPONSE_STX;
 
-    if(packet[1] & PACKED_ID_TYPE_NACK)
+    if(packet[1]&PACKED_ID_TYPE_NACK)
         return MORPHO_ERR_RESPONSE_NACK;
     else if(packet[1] & PACKED_ID_TYPE_ACK)
         RequestCounter += 1;

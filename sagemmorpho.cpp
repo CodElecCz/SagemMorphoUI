@@ -288,7 +288,10 @@ void SagemMorpho::putData(const QByteArray &data)
     }
     else
     {
-        ui->console->putData(data);
+        if(data.at(0) < 0x020 || data.at(0) > 0x7A)
+            ui->console->putDataHex(data);
+        else
+            ui->console->putData(data);
     }
 }
 
@@ -344,6 +347,58 @@ void SagemMorpho::sendTrace()
     m_request = MorphoRequest_None;
 
     ui->console->setData("$TRACE\r\n");
+}
+
+void SagemMorpho::sendIdentify0()
+{
+    m_request = MorphoRequest_None;
+
+    uint8_t rc = MORPHO_GetCounter();
+
+    uint8_t next = (uint8_t)(rc + 1);
+    MORPHO_SetCounter(next);
+
+    QString cmd = QString("$IDF00%1%2\r\n").arg(rc, 3, 10, QLatin1Char('0')).arg("05");
+    ui->console->setData(QByteArray::fromStdString(cmd.toStdString()));
+}
+
+void SagemMorpho::sendCancel0()
+{
+    m_request = MorphoRequest_None;
+
+    uint8_t rc = MORPHO_GetCounter();
+
+    uint8_t next = (uint8_t)(rc + 1);
+    MORPHO_SetCounter(next);
+
+    QString cmd = QString("$IDC00%1\r\n").arg(rc, 3, 10, QLatin1Char('0'));
+    ui->console->setData(QByteArray::fromStdString(cmd.toStdString()));
+}
+
+void SagemMorpho::sendIdentify1()
+{
+    m_request = MorphoRequest_None;
+
+    uint8_t rc = MORPHO_GetCounter();
+
+    uint8_t next = (uint8_t)(rc + 1);
+    MORPHO_SetCounter(next);
+
+    QString cmd = QString("$IDF01%1%2\r\n").arg(rc, 3, 10, QLatin1Char('0')).arg("05");
+    ui->console->setData(QByteArray::fromStdString(cmd.toStdString()));
+}
+
+void SagemMorpho::sendCancel1()
+{
+    m_request = MorphoRequest_None;
+
+    uint8_t rc = MORPHO_GetCounter();
+
+    uint8_t next = (uint8_t)(rc + 1);
+    MORPHO_SetCounter(next);
+
+    QString cmd = QString("$IDC01%1\r\n").arg(rc, 3, 10, QLatin1Char('0'));
+    ui->console->setData(QByteArray::fromStdString(cmd.toStdString()));
 }
 
 void SagemMorpho::on_desciptorButton_clicked()

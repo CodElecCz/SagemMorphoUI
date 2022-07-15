@@ -38,6 +38,10 @@ public slots:
     void sendBdr0();
     void sendBdr1();
     void sendTrace();
+    void sendIdentify0();
+    void sendCancel0();
+    void sendIdentify1();
+    void sendCancel1();
 
 private slots:
     void on_desciptorButton_clicked();
