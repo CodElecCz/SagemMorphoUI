@@ -42,6 +42,7 @@ public slots:
     void sendCancel0();
     void sendIdentify1();
     void sendCancel1();
+    void setAck(bool disabled) {m_ackDisable = disabled;}
 
 private slots:
     void on_desciptorButton_clicked();
@@ -69,6 +70,7 @@ private:
     int                     m_userId;
     int                     m_repeat;
     ReceiveState            m_receiveState;
+    bool                    m_ackDisable;
 };
 
 #endif // SAGEMMORPHO_H

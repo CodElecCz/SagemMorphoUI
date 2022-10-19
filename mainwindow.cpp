@@ -222,3 +222,8 @@ void MainWindow::writeAppSettings()
     settings.endGroup();
 }
 
+void MainWindow::on_actionACK_disable_triggered(bool checked)
+{
+     m_console->setAck(checked);
+}
+

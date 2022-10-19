@@ -23,7 +23,8 @@ SagemMorpho::SagemMorpho(QWidget *parent) :
     m_requestCancel(MorphoRequest_None),
     m_userId(1),
     m_repeat(1),
-    m_receiveState(ReceiveState_ReceiveSOP)
+    m_receiveState(ReceiveState_ReceiveSOP),
+    m_ackDisable(false)
 {
     ui->setupUi(this);
 
@@ -229,7 +230,8 @@ void SagemMorpho::receiveData()
 
     }
 
-    ack();
+    if(!m_ackDisable)
+        ack();
 
     //repeat
     switch(m_request)

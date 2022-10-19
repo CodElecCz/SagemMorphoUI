@@ -62,7 +62,7 @@ void MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 
 	//recalculate size
     data[1] = 0xff & (dataSize - 3);
-    data[2] = 0xff & ((dataSize - 3) >> 8);
+    data[2] = 0xff & ((dataSize - 3) >> 8);    
 
     MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);

@@ -36,6 +36,8 @@ private slots:
 
     void handleError(QSerialPort::SerialPortError error);
 
+    void on_actionACK_disable_triggered(bool checked);
+
 private:
     void initActionsConnections();
     void readAppSettings();

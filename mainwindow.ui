@@ -44,6 +44,8 @@
     </property>
     <addaction name="actionConfigure"/>
     <addaction name="actionClear"/>
+    <addaction name="separator"/>
+    <addaction name="actionACK_disable"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -252,6 +254,14 @@
    </property>
    <property name="toolTip">
     <string>CANCEL</string>
+   </property>
+  </action>
+  <action name="actionACK_disable">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>ACK disabled</string>
    </property>
   </action>
  </widget>
