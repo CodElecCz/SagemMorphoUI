@@ -199,7 +199,7 @@ void SagemMorpho::receiveData()
         {
             ui->console->putDataHex(m_response);
 
-            QString stat = QString("unexpected data\r\n");
+            QString stat = QString("Unexpected data\r\n");
             ui->console->putDataRaw(stat.toUtf8());
         }
         break;
@@ -305,6 +305,7 @@ void SagemMorpho::putData(const QByteArray &data)
                     (uint8_t)data.at(data.size() - 1) == ETX)
             {
                 //data
+                m_response.clear();
                 m_response.append(data);
 
                 receiveData();
