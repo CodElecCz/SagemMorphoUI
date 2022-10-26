@@ -191,7 +191,7 @@ static int MORPHO_UnStuffingData(uint8_t* Data, size_t* DataSize)
     return MORPHO_OK;
 }
 
-int MORPHO_ReciveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size_t* sopSize)
+int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size_t* sopSize)
 {
     if(packetSize < 3)
 		return MORPHO_ERR_RESPONSE_LENGTH;
@@ -227,7 +227,7 @@ int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t* identifier, 
 {
     size_t sopSize = 0;
     uint8_t rc = 0;
-    int err = MORPHO_ReciveSOP(packet, packetSize, &rc, &sopSize);
+    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize);
     if(err < MORPHO_OK)
         return err;
 

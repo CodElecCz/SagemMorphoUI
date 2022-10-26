@@ -144,19 +144,22 @@
 /*!
 * Status Codes definition :
 */
-#define ILVSTS_OK                       0       ///< Successful
-#define ILVSTS_HIT                      1       ///< Authentication or Identification succeed
-#define ILVSTS_NO_HIT                   2       ///< Authentication or Identification failed
-#define ILVSTS_LATENT                   3       ///< Security Protection Triggered
-#define ILVSTS_DB_FULL                  4       ///< The database is full
-#define ILVSTS_DB_EMPTY                 5       ///< The database is empty
-#define ILVSTS_BAD_QUALITY              6       ///< Bad finger and/or enroll quality
-#define ILVSTS_DB_OK                    7       ///< The database is right
-#define ILVSTS_ACTIVATED                8       ///< The MorphoModule is activated
-#define ILVSTS_NOTACTIVATED             9       ///< The MorphoModule is not activated
-#define ILVSTS_DB_KO                    10      ///< The flash can not be accessed
+#define ILVSTS_OK                       0x00    ///< Successful
+#define ILVSTS_HIT                      0x01    ///< Authentication or Identification succeed
+#define ILVSTS_NO_HIT                   0x02    ///< Authentication or Identification failed
+#define ILVSTS_LATENT                   0x03    ///< Security Protection Triggered
+#define ILVSTS_DB_FULL                  0x04    ///< The database is full
+#define ILVSTS_DB_EMPTY                 0x05    ///< The database is empty
+#define ILVSTS_BAD_QUALITY              0x06    ///< Bad finger and/or enroll quality
+#define ILVSTS_DB_OK                    0x07    ///< The database is right
+#define ILVSTS_ACTIVATED                0x08    ///< The MorphoModule is activated
+#define ILVSTS_NOTACTIVATED             0x09    ///< The MorphoModule is not activated
+#define ILVSTS_DB_KO                    0x0A	///< The flash can not be accessed
 #define ILVSTS_FFD                      0x22    ///< False finger detected
 #define ILVSTS_MOIST_FINGER             0x23    ///< Too moist finger detected
+#define ILVSTS_MOVED_FINGER 			0x24
+#define ILVSTS_SATURATED_FINGER			0x25
+#define ILVSTS_INVALID_FINGER 			0x26
 
 #endif /*__ILV_DEFINITIONS_H*/
 

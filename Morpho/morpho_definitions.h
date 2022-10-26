@@ -75,6 +75,7 @@ enum MorphoRequest
 #define MORPHO_ERR_DATA_DLE			-11
 #define MORPHO_ERR_DATA_ETX			-12
 #define MORPHO_ERR_VAL_LENGTH		-13
+#define MORPHO_ERR_CMD_ABORT		-14
 
 #ifdef __cplusplus
 }

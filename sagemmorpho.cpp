@@ -48,7 +48,7 @@ void SagemMorpho::receiveSOP()
     //check ack-nack
     size_t sopSize = 0;
     uint8_t rc = 0;
-    int err = MORPHO_ReciveSOP(packet, packetSize, &rc, &sopSize);
+    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize);
     if(err != MORPHO_OK)
     {
         if(err == MORPHO_ERR_RESPONSE_NACK)
