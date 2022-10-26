@@ -28,7 +28,7 @@ void MORPHO_AddEOP(uint8_t* PacketToSend, size_t* PacketCurrentSize);
 
 //response
 int MORPHO_ReciveSOP(const uint8_t* packet, size_t packetSize, uint8_t *RC, size_t* sopSize);
-int MORPHO_ReceiveData(uint8_t *packet, size_t packetSize, uint8_t **value, size_t* valueSize);
+int MORPHO_ReceiveData(uint8_t *packet, size_t packetSize, uint8_t* identifier, uint8_t **value, size_t* valueSize);
 
 #ifdef __cplusplus
 }

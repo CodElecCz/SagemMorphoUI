@@ -64,8 +64,7 @@ private:
 
 private:
     Ui::SagemMorpho*        ui;
-    enum MorphoRequest		m_request;
-    enum MorphoRequest		m_requestCancel;
+    enum MorphoRequest		m_request;    
     QByteArray              m_response;
     int                     m_userId;
     int                     m_repeat;

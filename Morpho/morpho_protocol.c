@@ -223,7 +223,7 @@ int MORPHO_ReciveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size
 	return MORPHO_OK;
 }
 
-int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t** value, size_t* valueSize)
+int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t* identifier, uint8_t** value, size_t* valueSize)
 {
     size_t sopSize = 0;
     uint8_t rc = 0;
@@ -252,6 +252,7 @@ int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t** value, size
     if(length != stuffedSize - 3 - 2) //3 ILV + 2 CRC
         return MORPHO_ERR_VAL_LENGTH;
 
+    *identifier = stuffed[0];
     *value = &stuffed[3];
     *valueSize = stuffedSize - 3 - 2;
 

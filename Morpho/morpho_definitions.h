@@ -16,7 +16,7 @@ extern "C" {
 
 enum MorphoRequest
 {
-	MorphoRequest_None = 0,
+    MorphoRequest_None          = 0,
 	MorphoRequest_GetDescriptor = ILV_GET_DESCRIPTOR,
 	MorphoRequest_ConfigureUart = ILV_CONFIG_UART,
 	MorphoRequest_GetBaseConfig = ILV_GET_BASE_CONFIG,
@@ -26,9 +26,8 @@ enum MorphoRequest
     MorphoRequest_DestroyBase   = ILV_DESTROY_DB,
     MorphoRequest_CreateBase    = ILV_CREATE_DB,
     MorphoRequest_Identify      = ILV_IDENTIFY,
-
-	MorphoRequest_Cancel        = ILV_CANCEL,
-	MorphoRequest_Cancel_Identify = (0xFF00 + ILV_IDENTIFY)
+    MorphoRequest_Cancel        = ILV_CANCEL,
+    MorphoRequest_AsynMessage   = ILV_ASYNC_MESSAGE
 };
 
 #define DLE						0x1B

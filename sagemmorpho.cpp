@@ -12,6 +12,7 @@
 #include "Morpho/morpho_create_base.h"
 #include "Morpho/morpho_identify.h"
 #include "Morpho/morpho_cancel.h"
+#include "Morpho/morpho_asynchronous_message.h"
 #include "Morpho/Ilv_errors.h"
 
 #include "ui_sagemmorpho.h"
@@ -20,7 +21,6 @@ SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SagemMorpho),
     m_request(MorphoRequest_None),
-    m_requestCancel(MorphoRequest_None),
     m_userId(1),
     m_repeat(1),
     m_receiveState(ReceiveState_ReceiveSOP),
@@ -64,30 +64,7 @@ void SagemMorpho::receiveSOP()
         ui->console->putDataHex(m_response.mid(0, sopSize));
         m_response.remove(0, sopSize);
 
-        //no data
-        switch(m_request)
-        {
-        case MorphoRequest_Cancel:
-            //Asynchronous messages are managed for all live-finger acquisition functions: Enroll, Verify, and Identify.
-            switch(m_requestCancel)
-            {
-            case MorphoRequest_Identify:
-                m_request = m_requestCancel;
-                m_requestCancel = MorphoRequest_None;
-
-                //receive data of aborted command
-                m_receiveState = ReceiveState_ReceiveData;
-                break;
-            default:
-                m_request = MorphoRequest_None;
-                m_requestCancel = MorphoRequest_None;
-                break;
-            }
-            return;
-        default:
-            m_receiveState = ReceiveState_ReceiveData;
-            return;
-        }
+        m_receiveState = ReceiveState_ReceiveData;
     }
 }
 
@@ -103,17 +80,18 @@ void SagemMorpho::receiveData()
     //check data
     uint8_t* value = NULL;
     size_t valueSize = 0;
+    uint8_t identifier = 0;
 
-    int err = MORPHO_ReceiveData(packet, packetSize, &value, &valueSize);
+    int err = MORPHO_ReceiveData(packet, packetSize, &identifier, &value, &valueSize);
     if(err != MORPHO_OK)
     {
         return;
     }
 
     uint8_t ilvErr = ILV_OK;
-    uint8_t ilvStatus = ILVSTS_OK;
+    uint8_t ilvStatus = ILVSTS_OK;    
 
-    switch(m_request)
+    switch(identifier)
     {
     case MorphoRequest_GetDescriptor:
         {
@@ -195,11 +173,25 @@ void SagemMorpho::receiveData()
             ui->console->putDataHex(m_response);
         }
         break;
+    case MorphoRequest_AsynMessage:
+        {
+            const char* msg = NULL;
+
+            ui->console->putDataHex(m_response);
+
+            err = MORPHO_AsynMeassage_Response(value, valueSize, &ilvErr, &msg);
+            if(msg)
+            {
+                ui->console->putData(msg, false);
+                ui->console->putDataRaw("\r\n");
+            }
+        }
+        break;
     default:
         {
             ui->console->putDataHex(m_response);
 
-            QString stat = QString("Unexpected data\r\n");
+            QString stat = QString("Unexpected data [id:%1]\r\n").arg(identifier);
             ui->console->putDataRaw(stat.toUtf8());
         }
         break;
@@ -587,7 +579,11 @@ void SagemMorpho::on_identifyButton_clicked()
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
-    MORPHO_Identify_Request(data, &dataSize, 0, 5);
+    uint16_t keepAlive = 0;
+    if(ui->keepAliveBox->isChecked())
+        keepAlive = 10;
+
+    MORPHO_Identify_Request(data, &dataSize, 0, 5, keepAlive);
 
     QByteArray request;
     request.append((char*)data, dataSize);
@@ -598,9 +594,6 @@ void SagemMorpho::on_identifyButton_clicked()
 
 void SagemMorpho::on_cancelButton_clicked()
 {
-    //store formal request
-    m_requestCancel = m_request;
-
     m_request = MorphoRequest_Cancel;
     m_receiveState = ReceiveState_ReceiveSOP;
 

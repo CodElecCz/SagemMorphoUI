@@ -12,9 +12,9 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize, uint16_t timeout, uint16_t threshold)
+void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize, uint16_t timeout, uint16_t threshold, uint16_t keepAlive)
 {
-    uint8_t data[9];
+    uint8_t data[24];
     size_t dataSize = 0;
 
 	//DATA
@@ -31,6 +31,31 @@ void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize, uint16_t timeo
     data[dataSize++] = 0xff & (threshold >> 8);
 
     data[dataSize++] = 0;	//RFU
+
+    if(keepAlive > 0)
+    {
+        //0x01 Finger position messages
+        //0x02 Live low-resolution images, and acquired fingerprint image (normal resolution)
+        //0x04 Enrolment step messages (ENROLL command only)
+        //0x08 Image of the acquired fingerprint only.
+        //0x40 Quality of the acquired fingerprint.
+        //0x80 Live quality of the detected fingerprint.
+        data[dataSize++] = ID_ASYNCHRONOUS_EVENT;
+        data[dataSize++] = 0x4;
+        data[dataSize++] = 0;
+        data[dataSize++] = 0x01;
+        data[dataSize++] = 0;
+        data[dataSize++] = 0;
+        data[dataSize++] = 0;
+
+        data[dataSize++] = ID_ALIVE_MESSAGE_TIME;
+        data[dataSize++] = 0x4;
+        data[dataSize++] = 0;
+        data[dataSize++] = 0xff & keepAlive;
+        data[dataSize++] = 0xff & (keepAlive >> 8);
+        data[dataSize++] = 0;
+        data[dataSize++] = 0;
+    }
 
 	//recalculate size
     data[1] = 0xff & (dataSize - 3);

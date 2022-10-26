@@ -53,6 +53,15 @@
 #define ILV_EXTENDED               0xFE
 #define ILV_ESCAPE                 0xFF
 
+/* ------------------------------------------------------------
+ * Asyn Message
+ */
+#define ID_MESSAGE_COMMAND_CMD          0x01
+#define ID_MESSAGE_IMAGE_CMD            0x02
+#define ID_MESSAGE_ENROLLMENT_CMD       0x04
+#define ID_MESSAGE_IMAGE_FULL_RES_CMD   0x08
+#define ID_MESSAGE_CODE_QUALITY_CMD     0x40
+#define ID_MESSAGE_DETECT_QUALITY_CMD   0x80
 
 /* ------------------------------------------------------------
  * Optional ILV
@@ -79,6 +88,7 @@
 #define	ID_X984                     85            //0x55
 #define ID_MATCHING_SCORE           86            //0x56
 #define	ID_TKB                      87            //0x57
+#define ID_ALIVE_MESSAGE_TIME       153           //0x99
 
 //Conversion de PK normalise
 #define ID_PK_COMP					2
