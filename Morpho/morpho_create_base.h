@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize);
+void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t maxNbOfRec);
 int MORPHO_CreateBase_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus);
 
 #ifdef __cplusplus

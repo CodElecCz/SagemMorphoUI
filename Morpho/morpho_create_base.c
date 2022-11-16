@@ -12,12 +12,11 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize)
+void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t maxNbOfRec)
 {
     uint8_t data[256];
     size_t dataSize = 0;
 
-    uint16_t maxNbOfRec = 500;
     uint8_t maxNbOfFp = 2;
 
     uint32_t fieldSize = 2;

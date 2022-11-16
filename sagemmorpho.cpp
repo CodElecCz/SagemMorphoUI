@@ -543,7 +543,8 @@ void SagemMorpho::on_createBaseButton_clicked()
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
-    MORPHO_CreateBase_Request(data, &dataSize);
+    uint16_t nbRec = ui->dbsRecNbBox->value();
+    MORPHO_CreateBase_Request(data, &dataSize, nbRec);
 
     QByteArray request;
     request.append((char*)data, dataSize);
