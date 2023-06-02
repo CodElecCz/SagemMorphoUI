@@ -51,8 +51,11 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="mouseTracking">
+          <bool>false</bool>
+         </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page">
           <property name="geometry">
@@ -251,7 +254,7 @@
                   <number>1</number>
                  </property>
                  <property name="maximum">
-                  <number>3000</number>
+                  <number>10000</number>
                  </property>
                  <property name="value">
                   <number>500</number>
