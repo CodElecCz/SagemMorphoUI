@@ -76,7 +76,7 @@ int MORPHO_GetDescriptor_Response(const uint8_t* value, size_t valueSize, uint8_
 
 	if(status == ILV_OK)
 	{
-		uint16_t index = 1;
+        int index = 1;
 
 		do
 		{

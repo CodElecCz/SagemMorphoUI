@@ -56,7 +56,7 @@ GetBaseConfig Response
 	ACK:  02 62 00			- STX + ID + RC
 */
 
-int MORPHO_GetBaseConfig_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus)
+int MORPHO_GetBaseConfig_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, SMorpho_GetBaseConfig *params)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
@@ -67,7 +67,36 @@ int MORPHO_GetBaseConfig_Response(const uint8_t* value, size_t valueSize, uint8_
 
 	if(status == ILV_OK)
 	{
-		;
+        params->fingerNb = value[1];
+        params->recNbMax = value[2] + ((uint32_t)value[3] << 8) + ((uint32_t)value[4] << 16) + ((uint32_t)value[5] << 24);
+        params->recNb = value[6] + ((uint32_t)value[7] << 8) + ((uint32_t)value[8] << 16) + ((uint32_t)value[9] << 24);
+        params->recNbFree = value[10] + ((uint32_t)value[11] << 8) + ((uint32_t)value[12] << 16) + ((uint32_t)value[13] << 24);
+        params->fieldNb = value[14] + ((uint32_t)value[15] << 8) + ((uint32_t)value[16] << 16) + ((uint32_t)value[17] << 24);
+
+        int index = 18;
+        int fieldIndex = 0;
+        do
+        {
+            uint8_t desc = value[index];
+            uint16_t size = value[index + 1] + ((uint16_t)value[index + 2] << 8);
+            index += 3;
+
+            switch(desc)
+            {
+            case ID_TIMESTAMP:
+                break;
+            case ID_PUBLIC_FIELD:
+                params->fieldDescription[fieldIndex].size = value[index] + ((uint16_t)value[index + 1] << 8);
+                params->fieldDescription[fieldIndex].name = (const char*)&value[index + 2];
+                fieldIndex++;
+                break;
+            default:
+                break;
+            }
+
+            index += size;
+
+        }while(index < valueSize);
 	}
 	else
         return MORPHO_WARN_VAL_ILV_ERROR;

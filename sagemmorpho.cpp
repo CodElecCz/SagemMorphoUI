@@ -112,9 +112,18 @@ void SagemMorpho::receiveData()
         break;
     case MorphoRequest_GetBaseConfig:
         {
-            err = MORPHO_GetBaseConfig_Response(value, valueSize, &ilvErr);
+            SMorpho_GetBaseConfig params = {};
+            err = MORPHO_GetBaseConfig_Response(value, valueSize, &ilvErr, &params);
 
-            ui->console->putDataHex(m_response);
+            QString sparams = QString("GetBaseConfig fingerNb:%1; recNb:%2 %3/%4; fieldNb:%5\r\n").arg(params.fingerNb).arg(params.recNb).arg(params.recNbFree).arg(params.recNbMax).arg(params.fieldNb);
+            ui->console->putData(sparams.toUtf8(), false);
+            for(int i = 0; i < params.fieldNb; i++)
+            {
+                QString sfield = QString("PublicField[%1] size:%2; name:'%3'\r\n").arg(i).arg(params.fieldDescription[i].size).arg(params.fieldDescription[i].name);
+                ui->console->putData(sfield.toUtf8(), false);
+            }
+
+            //ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_AddBaseRecord:

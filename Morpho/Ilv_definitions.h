@@ -66,40 +66,41 @@
 /* ------------------------------------------------------------
  * Optional ILV
  */
-#define ID_USER_ID                  4             //0x04
-#define ID_USER_DATA                5             //0x05
-#define ID_COM1                     6             //0x06
-#define ID_PULBIC_FIELD             15            //0x0F
-#define ID_PUC_DATA                 20            //0x14
-#define ID_DESC_PRODUCT             41            //0x29
-#define ID_DESC_SOFTWARE            42            //0x2A
-#define ID_DESC_SENSOR              43            //0x2B
-#define	ID_PRIVATE_FIELD            49            //0x31
-#define	ID_FIELD_CONTENT            50            //0x32
-#define ID_ASYNCHRONOUS_EVENT       52            //0x34
-#define	ID_USER_INDEX               54            //0x36
-#define ID_BIO_ALGO_PARAM           56            //0x38
-#define ID_EXPORT_IMAGE             61            //0x3D
-#define	ID_COMPRESSION              62            //0x3E
-#define	ID_PKM1                     63            //0x3F
-#define	ID_PKM1_PARAM               64            //0x40
-#define	ID_PKM1_DATA                65            //0x41
-#define	ID_X984_PARAM               84            //0x54
-#define	ID_X984                     85            //0x55
-#define ID_MATCHING_SCORE           86            //0x56
-#define	ID_TKB                      87            //0x57
-#define ID_ALIVE_MESSAGE_TIME       153           //0x99
+#define ID_USER_ID                  0x04
+#define ID_USER_DATA                0x05
+#define ID_COM1                     0x06
+#define ID_PUBLIC_FIELD             0x0F
+#define ID_TIMESTAMP                0x12
+#define ID_PUC_DATA                 0x14
+#define ID_DESC_PRODUCT             0x29
+#define ID_DESC_SOFTWARE            0x2A
+#define ID_DESC_SENSOR              0x2B
+#define	ID_PRIVATE_FIELD            0x31
+#define	ID_FIELD_CONTENT            0x32
+#define ID_ASYNCHRONOUS_EVENT       0x34
+#define	ID_USER_INDEX               0x36
+#define ID_BIO_ALGO_PARAM           0x38
+#define ID_EXPORT_IMAGE             0x3D
+#define	ID_COMPRESSION              0x3E
+#define	ID_PKM1                     0x3F
+#define	ID_PKM1_PARAM               0x40
+#define	ID_PKM1_DATA                0x41
+#define	ID_X984_PARAM               0x54
+#define	ID_X984                     0x55
+#define ID_MATCHING_SCORE           0x56
+#define	ID_TKB                      0x57
+#define ID_ALIVE_MESSAGE_TIME       0x99
 
 //Conversion de PK normalise
-#define ID_PK_COMP					2
+#define ID_PK_COMP					0x02
 #define ID_ISO_PK                   ID_PKM1        //0x3F
 #define ID_ISO_PK_PARAM             ID_PKM1_PARAM  //0x40
 #define ID_ISO_PK_DATA_ANSI_378     ID_PKM1_DATA   //0x41
-#define ID_ISO_PK_DATA_ILO_FMR      107            //0x6B
-#define ID_ISO_PK_DATA_ISO_FMC_CS   108            //0x6C
-#define ID_ISO_PK_DATA_ISO_FMC_NS   109            //0x6D
-#define ID_ISO_PK_DATA_ISO_FMR      110            //0x6E
-#define ID_ISO_PK_DATA_MINEX_A      111            //0x6F
+#define ID_ISO_PK_DATA_ILO_FMR      0x6B
+#define ID_ISO_PK_DATA_ISO_FMC_CS   0x6C
+#define ID_ISO_PK_DATA_ISO_FMC_NS   0x6D
+#define ID_ISO_PK_DATA_ISO_FMR      0x6E
+#define ID_ISO_PK_DATA_MINEX_A      0x6F
 
 
 #define ID_COMPRESSION_NULL      44      ///< No image compression

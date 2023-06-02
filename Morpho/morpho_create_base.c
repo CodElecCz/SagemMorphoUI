@@ -38,7 +38,7 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t max
     for(int i = 0; i < fieldSize; i++)
 	{
 		//ILV - Identifier 1b/Length 2b/Value
-        data[dataSize++] = ID_PULBIC_FIELD;
+        data[dataSize++] = ID_PUBLIC_FIELD;
         data[dataSize++] = 0x08;
         data[dataSize++] = 0;
 
