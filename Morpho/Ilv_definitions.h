@@ -6,11 +6,12 @@
  * General commands
  */
 #define ILV_GET_DESCRIPTOR          0x05
+#define ILV_GET_BASE_CONFIG         0x07
 
 /* ------------------------------------------------------------
  * Biometric commands
  */
-#define ILV_AUTHENTICATE            0x20
+#define ILV_VERIFY            		0x20
 #define ILV_ENROLL                  0x21
 #define ILV_IDENTIFY                0x22
 #define ILV_VERIFY_MATCH            0x23
@@ -19,13 +20,12 @@
 /* ------------------------------------------------------------
  * DataBase commands
  */
-#define ILV_GET_BASE_CONFIG         0x07
 #define ILV_CREATE_DB               0x30
 #define ILV_ERASE_BASE              0x32
 #define ILV_ADD_RECORD				0x35
 #define ILV_REMOVE_RECORD           0x36
 #define ILV_DESTROY_DB              0x3B
-#define ILV_LIST_PUBLIC_FIELDS      0x3E
+#define ILV_GET_PUBLIC_FIELDS      	0x3E
 #define ILV_GET_DATA                0x3F
 
 #define ID_NO_CHECK_ON_TEMPLATE	    0x60	//96
@@ -56,9 +56,10 @@
 /* ------------------------------------------------------------
  * Asyn Message
  */
-#define ID_MESSAGE_COMMAND_CMD          0x01
+#define ID_MESSAGE_FINGER_CMD           0x01	//Asynchronous command messages are sent by MSO devices to provide the host system with information on the acquisition process or to help the user to correctly place the finger on the sensor
 #define ID_MESSAGE_IMAGE_CMD            0x02
 #define ID_MESSAGE_ENROLLMENT_CMD       0x04
+#define ID_MESSAGE_BUSY_WARNING       	0x06	//Messages sent to the host at the beginning of a long time lasting action then every second while it is running.
 #define ID_MESSAGE_IMAGE_FULL_RES_CMD   0x08
 #define ID_MESSAGE_CODE_QUALITY_CMD     0x40
 #define ID_MESSAGE_DETECT_QUALITY_CMD   0x80
@@ -109,8 +110,9 @@
 #define ID_COMPRESSION_WSQ		156 	 ///< WSQ compresion
 
 /* Format for MSO_Get_Descriptor */
-#define ID_FORMAT_TEXT                  47      ///< Text format for Get_Descriptor function
-#define ID_FORMAT_BIN                   48      ///< Binary format for Get_Descriptor function
+#define ID_FORMAT_TEXT                  0x2F      ///< Text format for Get_Descriptor function
+#define ID_FORMAT_BIN                   0x74      ///< Binary format for Get_Descriptor function
+#define ID_FORMAT_BIN_MAX_USER          0x75      ///< Binary format for Get_Descriptor function
 
 /*!
 *  Status code return by function: o_puc_ILV_Status.
@@ -135,7 +137,7 @@
 #define ILVERR_FIELD_INVALID            0xE8    ///< Field size or field name is invalid.
 #define ILVERR_SECURITY_MODE            0xE7    ///< The request is not compatible with security mode.
 #define ILVERR_USER_NOT_FOUND           0xE6    ///< The searched user is not found.
-#define ILVERR_CMDE_ABORTED             0xE5    ///< Commanded has been aborted by the user.
+#define ILVERR_CMD_ABORTED              0xE5    ///< Commanded has been aborted by the user.
 #define ILVERR_SAME_FINGER              0xE4    ///< There are two templates of the same finger
 #define ILVERR_NO_HIT                   0xE3    ///< Presented finger does not match
 #define ILVERR_FFD                      0xDB    ///< False finger detected

@@ -12,14 +12,17 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
+int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 							     const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
 								 const char* userId,
 								 const char* userData[], size_t userDataSize,
 								 uint8_t no_check)
 {
-    uint8_t data[256];
+    uint8_t data[512]; //512
     size_t dataSize = 0;
+
+    if(sizeof(data) < (4 + 3 + tmplateSize + 4 + strlen(userId) + 4))
+    	return MORPHO_ERR_DATA_LENGTH; //TODO: check userDataSize
 
 	//DATA
 	//ILV - Identifier 1b/Length 2b/Value
@@ -37,7 +40,7 @@ void MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 
 	//ILV - Identifier 1b/Length 2b/Value
     data[dataSize++] = ID_USER_ID;
-    data[dataSize++] = strlen(userId) + 1;
+    data[dataSize++] = strlen(userId) + 1;	//The maximum size (L) of the User ID is 24 bytes
     data[dataSize++] = 0;
     memcpy(&data[dataSize], userId, strlen(userId));
     dataSize += strlen(userId);
@@ -62,11 +65,13 @@ void MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 
 	//recalculate size
     data[1] = 0xff & (dataSize - 3);
-    data[2] = 0xff & ((dataSize - 3) >> 8);    
+    data[2] = 0xff & ((dataSize - 3) >> 8);
 
     MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
     MORPHO_AddEOP(packet, packetSize);
+
+    return MORPHO_OK;
 }
 
 /*

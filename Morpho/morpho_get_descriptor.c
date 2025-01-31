@@ -10,7 +10,7 @@
 
 extern uint8_t 	RequestCounter;
 
-void MORPHO_GetDescriptor_Request(uint8_t* packet, size_t* packetSize)
+void MORPHO_GetDescriptorText_Request(uint8_t* packet, size_t* packetSize)
 {    
     uint8_t data[4];
     size_t dataSize = 0;
@@ -21,6 +21,40 @@ void MORPHO_GetDescriptor_Request(uint8_t* packet, size_t* packetSize)
     data[dataSize++] = sizeof(uint8_t);
     data[dataSize++] = 0;
     data[dataSize++] = ID_FORMAT_TEXT;
+
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
+}
+
+void MORPHO_GetDescriptorBinVer_Request(uint8_t* packet, size_t* packetSize)
+{
+    uint8_t data[4];
+    size_t dataSize = 0;
+
+    //DATA 4b
+	//ILV - Identifier 1b/Length 2b/Value
+    data[dataSize++] = ILV_GET_DESCRIPTOR;
+    data[dataSize++] = sizeof(uint8_t);
+    data[dataSize++] = 0;
+    data[dataSize++] = ID_FORMAT_BIN;
+
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
+}
+
+void MORPHO_GetDescriptorBinMaxUser_Request(uint8_t* packet, size_t* packetSize)
+{
+    uint8_t data[4];
+    size_t dataSize = 0;
+
+    //DATA 4b
+	//ILV - Identifier 1b/Length 2b/Value
+    data[dataSize++] = ILV_GET_DESCRIPTOR;
+    data[dataSize++] = sizeof(uint8_t);
+    data[dataSize++] = 0;
+    data[dataSize++] = ID_FORMAT_BIN_MAX_USER;
 
     MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
@@ -65,7 +99,7 @@ GetDescriptor Response
 	MSO Version: 09.00.c-C
 */
 
-int MORPHO_GetDescriptor_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char** product, const char** sensor, const char** software)
+int MORPHO_GetDescriptorText_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char** product, const char** sensor, const char** software)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
@@ -102,6 +136,91 @@ int MORPHO_GetDescriptor_Response(const uint8_t* value, size_t valueSize, uint8_
 			index += size;
 
 		}while(index < valueSize);
+	}
+	else
+        return MORPHO_WARN_VAL_ILV_ERROR;
+
+	return MORPHO_OK;
+}
+
+int MORPHO_GetDescriptor_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, uint8_t* type)
+{
+	if(valueSize==0)
+		return MORPHO_WARN_VAL_NO_DATA;
+
+	//all data collected
+	uint8_t status = value[0];
+	if(ilvStatus) *ilvStatus = status;
+
+	if(status == ILV_OK)
+	{
+		switch(value[1])
+		{
+		case ID_FORMAT_BIN:
+			if(type) *type = 1;
+			break;
+		case ID_FORMAT_BIN_MAX_USER:
+			if(type) *type = 2;
+			break;
+		default:
+			if(type) *type = 0;
+			break;
+		}
+	}
+	else
+		return MORPHO_WARN_VAL_ILV_ERROR;
+
+	return MORPHO_OK;
+}
+
+int MORPHO_GetDescriptorBinVer_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char** version, uint16_t* versionSize)
+{
+	if(valueSize==0)
+		return MORPHO_WARN_VAL_NO_DATA;
+
+	//all data collected
+	uint8_t status = value[0];
+	if(ilvStatus) *ilvStatus = status;
+
+	if(status == ILV_OK)
+	{
+		switch(value[1])
+		{
+		case ID_FORMAT_BIN:
+			if(valueSize > 4)
+			{
+				if(versionSize) *versionSize = value[2] + (value[3] << 8);
+				if(version) *version = (const char*)&value[4];
+			}
+			break;
+		}
+	}
+	else
+        return MORPHO_WARN_VAL_ILV_ERROR;
+
+	return MORPHO_OK;
+}
+
+int MORPHO_GetDescriptorBinMaxUser_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, uint16_t* max_user)
+{
+	if(valueSize==0)
+		return MORPHO_WARN_VAL_NO_DATA;
+
+	//all data collected
+	uint8_t status = value[0];
+	if(ilvStatus) *ilvStatus = status;
+
+	if(status == ILV_OK)
+	{
+		switch(value[1])
+		{
+		case ID_FORMAT_BIN_MAX_USER:
+			if(valueSize > 5)
+			{
+				if(max_user) *max_user = value[4] + (value[5] << 8);
+			}
+			break;
+		}
 	}
 	else
         return MORPHO_WARN_VAL_ILV_ERROR;

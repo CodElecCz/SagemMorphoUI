@@ -62,7 +62,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>
@@ -82,12 +82,50 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>140</width>
+                 <width>180</width>
                  <height>0</height>
                 </size>
                </property>
                <property name="text">
-                <string>Get Descriptor [0x05]</string>
+                <string>Get Descriptor Text [0x05]</string>
+               </property>
+              </widget>
+             </item>
+             <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+              <widget class="QPushButton" name="desciptorButton_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>180</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Get Descriptor BinVer [0x05]</string>
+               </property>
+              </widget>
+             </item>
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QPushButton" name="desciptorButton_3">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>180</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Get Descriptor MaxUser [0x05]</string>
                </property>
               </widget>
              </item>
@@ -113,7 +151,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>
@@ -204,7 +242,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>
@@ -387,7 +425,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>
@@ -400,7 +438,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>
@@ -413,7 +451,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>
@@ -426,7 +464,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>
@@ -439,7 +477,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>320</width>
+            <width>365</width>
             <height>285</height>
            </rect>
           </property>

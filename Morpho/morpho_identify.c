@@ -40,21 +40,21 @@ void MORPHO_Identify_Request(uint8_t* packet, size_t* packetSize, uint16_t timeo
         //0x08 Image of the acquired fingerprint only.
         //0x40 Quality of the acquired fingerprint.
         //0x80 Live quality of the detected fingerprint.
-        data[dataSize++] = ID_ASYNCHRONOUS_EVENT;
+    	data[dataSize++] = ID_ASYNCHRONOUS_EVENT;
         data[dataSize++] = 0x4;
         data[dataSize++] = 0;
         data[dataSize++] = 0x01;
-        data[dataSize++] = 0;
-        data[dataSize++] = 0;
-        data[dataSize++] = 0;
+		data[dataSize++] = 0;
+		data[dataSize++] = 0;
+		data[dataSize++] = 0;
 
-        data[dataSize++] = ID_ALIVE_MESSAGE_TIME;
+		data[dataSize++] = ID_ALIVE_MESSAGE_TIME;
         data[dataSize++] = 0x4;
         data[dataSize++] = 0;
         data[dataSize++] = 0xff & keepAlive;
         data[dataSize++] = 0xff & (keepAlive >> 8);
-        data[dataSize++] = 0;
-        data[dataSize++] = 0;
+		data[dataSize++] = 0;
+		data[dataSize++] = 0;
     }
 
 	//recalculate size
@@ -116,9 +116,9 @@ int MORPHO_Identify_Response(const uint8_t* value, size_t valueSize, uint8_t* il
 
             if(valueSize > 9 && value[6] == ID_USER_ID)
             {
-                uint8_t length = value[7] + (value[8] << 8);
-                if(userId)
-                    *userId = (const char*)&value[9];
+            	uint8_t length = value[7] + (value[8] << 8);
+				if(userId)
+					*userId = (const char*)&value[9];
             }
         }
 	}

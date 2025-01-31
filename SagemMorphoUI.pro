@@ -8,7 +8,7 @@ SOURCES += \
     Morpho/Ilv_crc.c \
     Morpho/Ilv_errors.c \
     Morpho/morpho_add_base_record.c \
-    Morpho/morpho_asynchronous_message.c \
+    Morpho/morpho_async_message.c \
     Morpho/morpho_cancel.c \
     Morpho/morpho_configure_uart.c \
     Morpho/morpho_create_base.c \
@@ -31,7 +31,7 @@ HEADERS += \
     Morpho/Ilv_definitions.h \
     Morpho/Ilv_errors.h \
     Morpho/morpho_add_base_record.h \
-    Morpho/morpho_asynchronous_message.h \
+    Morpho/morpho_async_message.h \
     Morpho/morpho_cancel.h \
     Morpho/morpho_configure_uart.h \
     Morpho/morpho_create_base.h \

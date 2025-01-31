@@ -20,7 +20,7 @@ static IVL_ERROR_TABLE IlvErrorTable[] =   /*01234567890123456789012345678901234
             { ILVERR_INVALID_USER_ID,		"The User ID is not valid" },                               // 0xFC
 			{ ILVERR_INVALID_USER_DATA,		"The user data are not valid" },    			 			// 0xFB 
 			{ ILVERR_TIMEOUT,				"No response after defined time" }, 						// 0xFA 
-			{ ILVERR_INVALID_ID_PROTOCOL,	"The protocole used is not valid" },						// 0xF9
+			{ ILVERR_INVALID_ID_PROTOCOL,	"The protocol used is not valid" },						// 0xF9
 			{ ILVERR_ALREADY_ENROLLED,		"The person is already in the base"},						// 0xF8
 			{ ILVERR_BASE_NOT_FOUND,		"The specified base does not exist"},   					// 0xF7
 			{ ILVERR_BASE_ALREADY_EXISTS,	"The specified base already exist"},    					// 0xF6
@@ -32,7 +32,7 @@ static IVL_ERROR_TABLE IlvErrorTable[] =   /*01234567890123456789012345678901234
 			{ ILVERR_FIELD_INVALID,  		"Field size or field name is invalid"  },					// 0xE8
 			{ ILVERR_SECURITY_MODE,  		"The request is not compatible with security mode" },		// 0xE7
 			{ ILVERR_USER_NOT_FOUND, 		"The searched user is not found" },							// 0xE6
-			{ ILVERR_CMDE_ABORTED,   		"Commanded has been aborted by the user" },					// 0xE5
+			{ ILVERR_CMD_ABORTED,   		"Commanded has been aborted by the user" },					// 0xE5
 			{ ILVERR_SAME_FINGER,   		"There are two templates of the same finger" },				// 0xE4
 			{ ILVERR_NO_HIT,				"Presented finger does not match" },						// 0xE3
 			{ ILVERR_FFD,					"False finger detected"},									// 0xDB 
@@ -45,9 +45,9 @@ static IVL_ERROR_TABLE IlvStatusTable[] =   /*0123456789012345678901234567890123
             { ILVSTS_HIT,					"Authentication or Identification succeeded" },				// 0x01
             { ILVSTS_NO_HIT,                "Authentication or Identification failed" },                // 0x02
             { ILVSTS_LATENT,                "Latent" },                                                 // 0x03
-            { ILVSTS_DB_FULL,               "The database is full." },                                  // 0x04
-            { ILVSTS_DB_EMPTY,              "The database is empty." },                                 // 0x05
-            { ILVSTS_BAD_QUALITY,           "Bad finger and-or enroll qualityy" }, 						// 0x06
+            { ILVSTS_DB_FULL,               "The database is full" },                                  // 0x04
+            { ILVSTS_DB_EMPTY,              "The database is empty" },                                 // 0x05
+            { ILVSTS_BAD_QUALITY,           "Bad finger and-or enroll quality" }, 						// 0x06
             { ILVSTS_DB_OK,                 "The database is right" },                                  // 0x07
             { ILVSTS_ACTIVATED,             "The MorphoModule is activated"},                           // 0x08
             { ILVSTS_NOTACTIVATED,          "The MorphoModule is not activated"},   					// 0x09

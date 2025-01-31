@@ -1,4 +1,4 @@
-#include "morpho_asynchronous_message.h"
+#include "morpho_async_message.h"
 #include "morpho_definitions.h"
 #include "morpho_protocol.h"
 
@@ -22,24 +22,33 @@ AsynMessage Response
 
 	confirm:
 	ACK:  02 62 00			- STX + ID + RC
+
+	Identify
+	MORPHO Data [0x02 0xE1 0xA1 0x71 0x08 0x00 0x00 0x01 0x04 0x00 0x00 0x00 0x00 0x00 0x50 0x97 0x1B 0x03 ]
+	MORPHO Data [0x02 0xE1 0xC7 0x71 0x08 0x00 0x00 0x01 0x04 0x00 0x09 0x00 0x00 0x00 0x27 0x64 0x1B 0x03 ] MORPHO_UNKNOWN
+	MORPHO Data [0x02 0xE1 0xC8 0x71 0x08 0x00 0x00 0x01 0x04 0x00 0x08 0x00 0x00 0x00 0x93 0x12 0x1B 0x03 ] MORPHO_FINGER_OK
+
+	TemplateAdd 10k
+	MORPHO Data [0x02 0xE1 0x5F 0x71 0x04 0x00 0x00 0x06 0x00 0x00 0x01 0x88 0x1B 0x03 ]
 */
 
-#define COMMAND_CMD_SIZE    9
-static const char* COMMAND_CMD[COMMAND_CMD_SIZE + 1] =
+#define FINGER_CMD_SIZE    10
+static const char* FINGER_CMD[FINGER_CMD_SIZE + 1] =
 {
-    "MORPHO_MOVE_NO_FINGER",
-    "MORPHO_MOVE_FINGER_UP",
-    "MORPHO_MOVE_FINGER_DOWN",
-    "MORPHO_MOVE_FINGER_LEFT",
-    "MORPHO_MOVE_FINGER_RIGHT",
-    "MORPHO_PRESS_FINGER_HARDER",
-    "MORPHO_LATENT",
-    "MORPHO_REMOVE_FINGER",
-    "MORPHO_FINGER_OK",
-    "MORPHO_UNKNOWN"
+    "NO_FINGER",
+    "MOVE_FINGER_UP",
+    "MOVE_FINGER_DOWN",
+    "MOVE_FINGER_LEFT",
+    "MOVE_FINGER_RIGHT",
+    "PRESS_HARDER",
+    "LATENT",
+    "REMOVE_FINGER",
+    "FINGER_OK",
+    "FINGER_DETECTED",
+	"UNKNOWN"
 };
 
-int MORPHO_AsynMeassage_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char** msg)
+int MORPHO_AsyncMeassage_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char** msg)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
@@ -60,17 +69,20 @@ int MORPHO_AsynMeassage_Response(const uint8_t* value, size_t valueSize, uint8_t
 
             switch(message)
             {
-            case ID_MESSAGE_COMMAND_CMD:
+            case ID_MESSAGE_FINGER_CMD:
                 {
                     uint8_t command = value[index];
-                    if(command < COMMAND_CMD_SIZE)
+                    if(command < FINGER_CMD_SIZE)
                     {
-                        *msg = COMMAND_CMD[command];
+                        *msg = FINGER_CMD[command];
                     }
                     else
-                        *msg = COMMAND_CMD[COMMAND_CMD_SIZE];
+                        *msg = FINGER_CMD[FINGER_CMD_SIZE];
                 }
                 break;
+            case ID_MESSAGE_BUSY_WARNING:
+            	*msg = "BUSY_WARNING";
+            	break;
             default:
                 break;
             }

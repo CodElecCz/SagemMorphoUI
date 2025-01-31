@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Sagem MORPHO Terminal (v1.1)</string>
+   <string>Sagem MORPHO Terminal (v1.2)</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources/resource.qrc">
@@ -267,8 +267,8 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="resources/resource.qrc"/>
   <include location="morpho.qrc"/>
+  <include location="resources/resource.qrc"/>
  </resources>
  <connections/>
 </ui>

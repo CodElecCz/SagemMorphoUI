@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-void MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
+int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
                                  const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
                                  const char* userId,
                                  const char* userData[], size_t userDataSize,

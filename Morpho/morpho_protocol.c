@@ -191,7 +191,7 @@ static int MORPHO_UnStuffingData(uint8_t* Data, size_t* DataSize)
     return MORPHO_OK;
 }
 
-int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size_t* sopSize)
+int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size_t* sopSize, uint8_t isData)
 {
     if(packetSize < 3)
 		return MORPHO_ERR_RESPONSE_LENGTH;
@@ -199,9 +199,9 @@ int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, siz
     if(packet[0] != STX)
 		return MORPHO_ERR_RESPONSE_STX;
 
-    if(packet[1]&PACKED_ID_TYPE_NACK)
-        return MORPHO_ERR_RESPONSE_NACK;
-    else if(packet[1] & PACKED_ID_TYPE_ACK)
+    if(!isData && packet[1]&PACKED_ID_TYPE_DATA)
+        return MORPHO_ERR_RESPONSE_DATA;
+    else if(packet[1] & PACKED_ID_TYPE_ACK || packet[1]&PACKED_ID_TYPE_NACK)
         RequestCounter += 1;
 
     if(packet[2] != DLE)
@@ -220,6 +220,9 @@ int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, siz
         *sopSize = 4;
     }
 
+    if(packet[1]&PACKED_ID_TYPE_NACK)
+    	return MORPHO_ERR_RESPONSE_NACK;
+
 	return MORPHO_OK;
 }
 
@@ -227,7 +230,7 @@ int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t* identifier, 
 {
     size_t sopSize = 0;
     uint8_t rc = 0;
-    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize);
+    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize, 1);
     if(err < MORPHO_OK)
         return err;
 

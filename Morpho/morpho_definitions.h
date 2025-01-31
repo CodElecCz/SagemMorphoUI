@@ -16,18 +16,19 @@ extern "C" {
 
 enum MorphoRequest
 {
-    MorphoRequest_None          = 0,
+	MorphoRequest_None = 0,
 	MorphoRequest_GetDescriptor = ILV_GET_DESCRIPTOR,
 	MorphoRequest_ConfigureUart = ILV_CONFIG_UART,
 	MorphoRequest_GetBaseConfig = ILV_GET_BASE_CONFIG,
 	MorphoRequest_GetData       = ILV_GET_DATA,
+	MorphoRequest_GetPublicFields  = ILV_GET_PUBLIC_FIELDS,
 	MorphoRequest_AddBaseRecord = ILV_ADD_RECORD,
     MorphoRequest_EraseBase     = ILV_ERASE_BASE,
     MorphoRequest_DestroyBase   = ILV_DESTROY_DB,
     MorphoRequest_CreateBase    = ILV_CREATE_DB,
     MorphoRequest_Identify      = ILV_IDENTIFY,
-    MorphoRequest_Cancel        = ILV_CANCEL,
-    MorphoRequest_AsynMessage   = ILV_ASYNC_MESSAGE
+	MorphoRequest_Cancel        = ILV_CANCEL,
+    MorphoRequest_AsyncMessage  = ILV_ASYNC_MESSAGE
 };
 
 #define DLE						0x1B
@@ -76,6 +77,8 @@ enum MorphoRequest
 #define MORPHO_ERR_DATA_ETX			-12
 #define MORPHO_ERR_VAL_LENGTH		-13
 #define MORPHO_ERR_CMD_ABORT		-14
+#define MORPHO_ERR_RESPONSE_WAIT	-15
+#define MORPHO_ERR_READER_ID		-16
 
 #ifdef __cplusplus
 }

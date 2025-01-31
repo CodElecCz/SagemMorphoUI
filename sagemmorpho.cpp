@@ -12,10 +12,24 @@
 #include "Morpho/morpho_create_base.h"
 #include "Morpho/morpho_identify.h"
 #include "Morpho/morpho_cancel.h"
-#include "Morpho/morpho_asynchronous_message.h"
+#include "Morpho/morpho_async_message.h"
 #include "Morpho/Ilv_errors.h"
 
 #include "ui_sagemmorpho.h"
+
+typedef enum EMorpho_GetDescriptorFomat
+{
+    EMorpho_GetDescriptorFomat_Text = 0,
+    EMorpho_GetDescriptorFomat_BinVer,
+    EMorpho_GetDescriptorFomat_BinMaxUser
+} EMorpho_GetDescriptorFomat;
+
+typedef struct SMorpho_DescriptorField
+{
+    uint16_t size;
+    char name[7];
+
+} SMorpho_DescriptorField;
 
 SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
@@ -48,7 +62,7 @@ void SagemMorpho::receiveSOP()
     //check ack-nack
     size_t sopSize = 0;
     uint8_t rc = 0;
-    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize);
+    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize, 0);
     if(err != MORPHO_OK)
     {
         if(err == MORPHO_ERR_RESPONSE_NACK)
@@ -95,17 +109,48 @@ void SagemMorpho::receiveData()
     {
     case MorphoRequest_GetDescriptor:
         {
-            const char* product = NULL;
-            const char* sensor = NULL;
-            const char* software = NULL;
+            uint8_t format = 0;
+            err = MORPHO_GetDescriptor_Response(value, valueSize, &ilvErr, &format);
 
-            err = MORPHO_GetDescriptor_Response(value, valueSize, &ilvErr, &product, &sensor, &software);
-            if(product)
-                ui->console->putData(product, false);
-            if(sensor)
-                ui->console->putData(sensor, false);
-            if(software)
-                ui->console->putData(software, false);
+            switch(format)
+            {
+            case EMorpho_GetDescriptorFomat_Text:
+                {
+                const char* product = NULL;
+                const char* sensor = NULL;
+                const char* software = NULL;
+
+                MORPHO_GetDescriptorText_Response(value, valueSize, &ilvErr, &product, &sensor, &software);
+                if(product)
+                    ui->console->putData(product, false);
+                if(sensor)
+                    ui->console->putData(sensor, false);
+                if(software)
+                    ui->console->putData(software, false);
+                }
+                break;
+            case EMorpho_GetDescriptorFomat_BinVer:
+                {
+                const char* version = NULL;
+                uint16_t versionSize = 0;
+                MORPHO_GetDescriptorBinVer_Response(value, valueSize, &ilvErr, &version, &versionSize);
+                if(version)
+                {
+                    char ver[32] = {};
+                    memcpy(ver, version, versionSize);
+                    ui->console->putData(ver, false);
+                }
+                }
+                break;
+            case EMorpho_GetDescriptorFomat_BinMaxUser:
+                {
+                uint16_t maxUser = 0;
+                MORPHO_GetDescriptorBinMaxUser_Response(value, valueSize, &ilvErr, &maxUser);
+                QString sfield = QString("MaxUser: %1").arg(maxUser);
+                ui->console->putData(sfield.toUtf8(), false);
+                }
+                break;
+            }
 
             ui->console->putDataRaw("\r\n");
         }
@@ -182,13 +227,13 @@ void SagemMorpho::receiveData()
             ui->console->putDataHex(m_response);
         }
         break;
-    case MorphoRequest_AsynMessage:
+    case MorphoRequest_AsyncMessage:
         {
             const char* msg = NULL;
 
             ui->console->putDataHex(m_response);
 
-            err = MORPHO_AsynMeassage_Response(value, valueSize, &ilvErr, &msg);
+            err = MORPHO_AsyncMeassage_Response(value, valueSize, &ilvErr, &msg);
             if(msg)
             {
                 ui->console->putData(msg, false);
@@ -436,7 +481,7 @@ void SagemMorpho::on_desciptorButton_clicked()
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
-    MORPHO_GetDescriptor_Request(data, &dataSize);
+    MORPHO_GetDescriptorText_Request(data, &dataSize);
 
     QByteArray request;
     request.append((char*)data, dataSize);
@@ -444,6 +489,39 @@ void SagemMorpho::on_desciptorButton_clicked()
     ui->console->setDataHex(request);
 }
 
+void SagemMorpho::on_desciptorButton_2_clicked()
+{
+    m_request = MorphoRequest_GetDescriptor;
+    m_receiveState = ReceiveState_ReceiveSOP;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_GetDescriptorBinVer_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+void SagemMorpho::on_desciptorButton_3_clicked()
+{
+    m_request = MorphoRequest_GetDescriptor;
+    m_receiveState = ReceiveState_ReceiveSOP;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_GetDescriptorBinMaxUser_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
 
 void SagemMorpho::on_configUartButton_clicked()
 {
@@ -492,11 +570,15 @@ void SagemMorpho::addRecord(int userId)
 
     size_t tmplateSize = sizeof(tmplate);
     uint8_t tmplateId = ID_PK_COMP;
-    const char* userData[] = {"name", "surname"};
-    size_t userDataSize = 2;
+
     uint8_t no_check = 1;
 
     QString user = QStringLiteral("%1 ").arg(userId, 8, 10, QLatin1Char('0'));
+
+    //user data
+    size_t userDataSize = 1;
+    QString userData0 = QStringLiteral("%1 ").arg(userId, 8, 10, QLatin1Char('0'));
+    const char* userData[] = {userData0.toStdString().c_str()};
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
