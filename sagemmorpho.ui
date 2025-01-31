@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>844</width>
-    <height>531</height>
+    <height>770</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
           <bool>false</bool>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="page">
           <property name="geometry">
@@ -63,7 +63,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">
@@ -152,7 +152,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">
@@ -243,7 +243,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">
@@ -403,6 +403,32 @@
                </property>
               </widget>
              </item>
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QPushButton" name="getPublicFieldsButton">
+               <property name="minimumSize">
+                <size>
+                 <width>140</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Get Public Fields Id [0x3E]</string>
+               </property>
+              </widget>
+             </item>
+             <item alignment="Qt::AlignHCenter">
+              <widget class="QPushButton" name="getPublicFieldsButton_2">
+               <property name="minimumSize">
+                <size>
+                 <width>140</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Get Public Fields [0x3E]</string>
+               </property>
+              </widget>
+             </item>
              <item>
               <spacer name="verticalSpacer_3">
                <property name="orientation">
@@ -426,7 +452,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">
@@ -439,7 +465,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">
@@ -452,7 +478,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">
@@ -465,7 +491,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">
@@ -478,7 +504,7 @@
             <x>0</x>
             <y>0</y>
             <width>365</width>
-            <height>285</height>
+            <height>524</height>
            </rect>
           </property>
           <attribute name="label">

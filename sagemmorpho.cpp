@@ -12,6 +12,7 @@
 #include "Morpho/morpho_create_base.h"
 #include "Morpho/morpho_identify.h"
 #include "Morpho/morpho_cancel.h"
+#include "Morpho/morpho_get_public_fields.h"
 #include "Morpho/morpho_async_message.h"
 #include "Morpho/Ilv_errors.h"
 
@@ -213,6 +214,24 @@ void SagemMorpho::receiveData()
     case MorphoRequest_CreateBase:
         {
             err = MORPHO_CreateBase_Response(value, valueSize, &ilvErr);
+
+            ui->console->putDataHex(m_response);
+        }
+        break;
+    case MorphoRequest_GetPublicFields:
+        {
+            SMorpho_GetPublicFields params = {};
+
+            err = MORPHO_GetPublicFields_Response(value, valueSize, &ilvErr, &params);
+
+            QString sfield = QString("PublicField fieldNb:'%1'\r\n").arg(params.fieldNb);
+            ui->console->putData(sfield.toUtf8(), false);
+
+            for(uint32_t i = 0; i < params.fieldNb; i++)
+            {
+                QString sfield = QString("PublicField[%1] name:'%2'\r\n").arg(i).arg(params.fieldDescription[i]);
+                ui->console->putData(sfield.toUtf8(), false);
+            }
 
             ui->console->putDataHex(m_response);
         }
@@ -573,12 +592,14 @@ void SagemMorpho::addRecord(int userId)
 
     uint8_t no_check = 1;
 
-    QString user = QStringLiteral("%1 ").arg(userId, 8, 10, QLatin1Char('0'));
+    QString user = QStringLiteral("%1").arg(userId, 8, 10, QLatin1Char('0'));
 
     //user data
     size_t userDataSize = 1;
-    QString userData0 = QStringLiteral("%1 ").arg(userId, 8, 10, QLatin1Char('0'));
-    const char* userData[] = {userData0.toStdString().c_str()};
+    QString userData0 = QStringLiteral("%1").arg(userId, 8, 12, QLatin1Char('9'));
+    char cuserData0[32] = {};
+    strcpy(cuserData0, userData0.toStdString().c_str());
+    const char* userData[] = {cuserData0};
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
@@ -654,6 +675,40 @@ void SagemMorpho::on_getBaseConfigButton_clicked()
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
     MORPHO_GetBaseConfig_Request(data, &dataSize);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+void SagemMorpho::on_getPublicFieldsButton_clicked()
+{
+    m_request = MorphoRequest_GetBaseConfig;
+    m_receiveState = ReceiveState_ReceiveSOP;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_GetPublicFields_Request(data, &dataSize, 0);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
+
+void SagemMorpho::on_getPublicFieldsButton_2_clicked()
+{
+    m_request = MorphoRequest_GetBaseConfig;
+    m_receiveState = ReceiveState_ReceiveSOP;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    MORPHO_GetPublicFields_Request(data, &dataSize, 1);
 
     QByteArray request;
     request.append((char*)data, dataSize);

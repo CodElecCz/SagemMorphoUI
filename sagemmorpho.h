@@ -56,6 +56,8 @@ private slots:
     void on_getBaseConfigButton_clicked();
     void on_identifyButton_clicked();
     void on_cancelButton_clicked();
+    void on_getPublicFieldsButton_clicked();
+    void on_getPublicFieldsButton_2_clicked();
 
 private:
     void addRecord(int userId);

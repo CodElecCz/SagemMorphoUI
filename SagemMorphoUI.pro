@@ -17,6 +17,7 @@ SOURCES += \
     Morpho/morpho_get_base_config.c \
     Morpho/morpho_get_data.c \
     Morpho/morpho_get_descriptor.c \
+    Morpho/morpho_get_public_fields.c \
     Morpho/morpho_identify.c \
     Morpho/morpho_protocol.c \
     main.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     Morpho/morpho_get_base_config.h \
     Morpho/morpho_get_data.h \
     Morpho/morpho_get_descriptor.h \
+    Morpho/morpho_get_public_fields.h \
     Morpho/morpho_identify.h \
     Morpho/morpho_protocol.h \
     mainwindow.h \

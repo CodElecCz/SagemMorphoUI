@@ -41,9 +41,14 @@ GetBaseConfig Response
 	ACK:  02 E2 00			- STX + ID + RC
 	response:
 		02 E1 00 			- STX + ID + RC
-		3F 03 00   			- ILV_GET_DATA + 0x0003 total length 3B
+        3E 44 00   			- ILV_GET_DATA + 0x0044 total length 3B
 		00  				- status ILV_OK/ILVERR_BADPARAMETER/ILVERR_ERROR
-		31 00				- User Data "1"
+        03 00 00 00         - nb of fields
+        32                  - FIELD CONTENT ID 0x32
+            12 00           - size 18
+            01 00 00 00     - Field index 4b
+            0a 00 00 00     - Data length 4b = 10
+            <data>
 
 		5C D5 1B 03			- CrcL + CrcH + DLE + ETX
 
@@ -51,7 +56,7 @@ GetBaseConfig Response
 	ACK:  02 62 00			- STX + ID + RC
 */
 
-int MORPHO_GetPublicFields_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, uint32_t* userNumber)
+int MORPHO_GetPublicFields_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, SMorpho_GetPublicFields* fields)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
@@ -62,8 +67,31 @@ int MORPHO_GetPublicFields_Response(const uint8_t* value, size_t valueSize, uint
 
 	if(status == ILV_OK)
 	{
-		if(userNumber)
-			*userNumber = value[1] + (value[2] << 8) + (value[3] << 16) + (value[4] << 24);
+        if(fields != NULL)
+        {
+            fields->fieldNb = value[1] + (value[2] << 8) + (value[3] << 16) + (value[4] << 24);
+
+            uint16_t fieldIndex = 0;
+            for(uint16_t i = 5; i < valueSize; i++)
+            {
+                if(value[i] == ID_FIELD_CONTENT)
+                {
+                    uint16_t fieldSize = value[i+1] + (value[i+2] << 8);
+                    uint32_t fieldIndex = value[i+3] + (value[i+4] << 8) + (value[i+5] << 16) + (value[i+6] << 24);
+                    uint32_t dataSize = value[i+7] + (value[i+8] << 8) + (value[i+9] << 16) + (value[i+10] << 24);
+                    fields->fieldDescription[fieldIndex] = &value[i+11];
+
+                    i += 10 + dataSize;
+
+                    if(SMorpho_GetPublicFields_Size > fieldIndex + 1)
+                        fieldIndex++;
+                    else
+                        break;
+                }
+                else
+                    break;
+            }
+        }
 	}
 	else
         return MORPHO_WARN_VAL_ILV_ERROR;
