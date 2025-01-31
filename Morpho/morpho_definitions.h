@@ -59,6 +59,7 @@ enum MorphoRequest
 /*
  * MORPHO
  */
+#define MORPHO_WARN_DATA_CONTINUE   4
 #define MORPHO_WARN_VAL_NO_DATA		3
 #define MORPHO_WARN_VAL_ILV_STATUS	2
 #define MORPHO_WARN_VAL_ILV_ERROR	1

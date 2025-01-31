@@ -70,6 +70,7 @@ private:
     Ui::SagemMorpho*        ui;
     enum MorphoRequest		m_request;    
     QByteArray              m_response;
+    QByteArray              m_responseExt;
     int                     m_userId;
     int                     m_repeat;
     ReceiveState            m_receiveState;

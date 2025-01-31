@@ -15,6 +15,20 @@
 extern "C" {
 #endif
 
+typedef enum EMorpho_GetDescriptorFomat
+{
+    EMorpho_GetDescriptorFomat_Text = 0,
+    EMorpho_GetDescriptorFomat_BinVer,
+    EMorpho_GetDescriptorFomat_BinMaxUser
+} EMorpho_GetDescriptorFomat;
+
+typedef struct SMorpho_DescriptorField
+{
+    uint16_t size;
+    char name[7];
+
+} SMorpho_DescriptorField;
+
 void MORPHO_GetDescriptorText_Request(uint8_t* data, size_t* dataSize);
 void MORPHO_GetDescriptorBinVer_Request(uint8_t* packet, size_t* packetSize);
 void MORPHO_GetDescriptorBinMaxUser_Request(uint8_t* packet, size_t* packetSize);

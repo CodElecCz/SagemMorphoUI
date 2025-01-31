@@ -18,20 +18,6 @@
 
 #include "ui_sagemmorpho.h"
 
-typedef enum EMorpho_GetDescriptorFomat
-{
-    EMorpho_GetDescriptorFomat_Text = 0,
-    EMorpho_GetDescriptorFomat_BinVer,
-    EMorpho_GetDescriptorFomat_BinMaxUser
-} EMorpho_GetDescriptorFomat;
-
-typedef struct SMorpho_DescriptorField
-{
-    uint16_t size;
-    char name[7];
-
-} SMorpho_DescriptorField;
-
 SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SagemMorpho),
@@ -63,7 +49,8 @@ void SagemMorpho::receiveSOP()
     //check ack-nack
     size_t sopSize = 0;
     uint8_t rc = 0;
-    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize, 0);
+    uint8_t flag = 0;
+    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &flag, &sopSize, 0);
     if(err != MORPHO_OK)
     {
         if(err == MORPHO_ERR_RESPONSE_NACK)
@@ -100,6 +87,23 @@ void SagemMorpho::receiveData()
     int err = MORPHO_ReceiveData(packet, packetSize, &identifier, &value, &valueSize);
     if(err != MORPHO_OK)
     {
+        if(err == MORPHO_WARN_DATA_CONTINUE)
+        {
+            m_responseExt.append(m_response.data(), (int)valueSize);
+
+            QString sfield = QString("append: %1\r\n").arg(valueSize);
+            ui->console->putData(sfield.toUtf8(), false);
+
+            if(!m_ackDisable)
+                ack();
+
+        }
+
+        if(err<=MORPHO_ERR_VAL_LENGTH)
+        {
+            QString sfield = QString("err: %1, id: %2, size:%3\r\n").arg(err).arg(identifier).arg(valueSize);
+            ui->console->putData(sfield.toUtf8(), false);
+        }
         return;
     }
 
@@ -344,7 +348,7 @@ void SagemMorpho::putData(const QByteArray &data)
         switch(m_receiveState)
         {
         case ReceiveState_ReceiveSOP:
-            receiveSOP();
+            receiveSOP();           
 
             //check if data
             if(m_receiveState == ReceiveState_ReceiveData)

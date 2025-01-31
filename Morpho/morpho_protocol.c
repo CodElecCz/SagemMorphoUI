@@ -191,7 +191,7 @@ static int MORPHO_UnStuffingData(uint8_t* Data, size_t* DataSize)
     return MORPHO_OK;
 }
 
-int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, size_t* sopSize, uint8_t isData)
+int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, uint8_t* flag, size_t* sopSize, uint8_t isData)
 {
     if(packetSize < 3)
 		return MORPHO_ERR_RESPONSE_LENGTH;
@@ -206,7 +206,8 @@ int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, siz
 
     if(packet[2] != DLE)
     {
-        *RC = packet[2];
+        if(RC != NULL)
+            *RC = packet[2];
         *sopSize = 3;
     }
     else //stuffed
@@ -216,12 +217,18 @@ int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, siz
 
         uint8_t rc = packet[3];
         MORPHO_UnStuffing(&rc);
-        *RC = rc;
+        if(RC != NULL)
+            *RC = rc;
         *sopSize = 4;
     }
 
     if(packet[1]&PACKED_ID_TYPE_NACK)
-    	return MORPHO_ERR_RESPONSE_NACK;
+        return MORPHO_ERR_RESPONSE_NACK;
+
+    if(flag)
+    {
+        *flag = (packet[1]&(PACKED_ID_FLAG_FIRST | PACKED_ID_FLAG_LAST));
+    }
 
 	return MORPHO_OK;
 }
@@ -230,7 +237,8 @@ int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t* identifier, 
 {
     size_t sopSize = 0;
     uint8_t rc = 0;
-    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &sopSize, 1);
+    uint8_t flag = 0;
+    int err = MORPHO_ReceiveSOP(packet, packetSize, &rc, &flag, &sopSize, 1);
     if(err < MORPHO_OK)
         return err;
 
@@ -250,14 +258,29 @@ int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t* identifier, 
 
     MORPHO_UnStuffingData(stuffed, &stuffedSize);
 
+    uint8_t type = flag >> 5;
+
     //ILV 1b + 2b + data
-    uint16_t length = stuffed[1] + (stuffed[2] << 8);
-    if(length != stuffedSize - 3 - 2) //3 ILV + 2 CRC
+    uint16_t length = stuffed[1] + (stuffed[2] << 8); //length of all packets
+    uint16_t lengthPacket = stuffedSize - 3 - 2;
+    if(type==3 && length != lengthPacket) //3 ILV + 2 CRC
+    {
+        *valueSize = length;
         return MORPHO_ERR_VAL_LENGTH;
+    }
 
     *identifier = stuffed[0];
     *value = &stuffed[3];
-    *valueSize = stuffedSize - 3 - 2;
+    *valueSize = lengthPacket;
 
-	return MORPHO_OK;
+    if(type == 2) //first
+    {
+        return MORPHO_WARN_DATA_CONTINUE;
+    }
+    else if(type == 0) //middle
+    {
+        return MORPHO_WARN_DATA_CONTINUE;
+    }
+    else
+        return MORPHO_OK;
 }
