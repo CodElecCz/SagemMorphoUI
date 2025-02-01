@@ -43,13 +43,13 @@ void MORPHO_GetData_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldI
 
 void MORPHO_GetDataId_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldIndex, const char userId[])
 {
-    uint8_t data[15];
+    uint8_t data[35];
     size_t dataSize = 0;
 
     //DATA 12b
     //ILV - Identifier 1b/Length 2b/Value
     data[dataSize++] = ILV_GET_DATA;
-    data[dataSize++] = 5 + 7;
+    data[dataSize++] = 5 + 3 + strlen(userId) + 1;
     data[dataSize++] = 0;
     data[dataSize++] = 0;	//Database identifier
     data[dataSize++] = fieldIndex & 0xff;
