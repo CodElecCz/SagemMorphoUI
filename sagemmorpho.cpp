@@ -18,7 +18,7 @@
 
 #include "ui_sagemmorpho.h"
 
-#include <QCryptographicHash>
+//#include <QCryptographicHash>
 
 SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
@@ -94,9 +94,9 @@ void SagemMorpho::receiveData()
             m_responseExt.append(QByteArray::fromRawData((const char*)value, valueSize));
             m_response.clear();
 
-            SMorphoProtocol morpho = MORPHO_GetProtocol();
-            QString sfield = QString("MORPHO frame append index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
-            ui->console->putData(sfield.toUtf8(), false);
+            //SMorphoProtocol morpho = MORPHO_GetProtocol();
+            //QString sfield = QString("MORPHO frame append index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
+            //ui->console->putData(sfield.toUtf8(), false);
 
             if(!m_ackDisable)
                 ack();
@@ -116,9 +116,9 @@ void SagemMorpho::receiveData()
         m_response.append(m_responseExt);
         m_responseExt.clear();
 
-        SMorphoProtocol morpho = MORPHO_GetProtocol();
-        QString sfield = QString("MORPHO frame final index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
-        ui->console->putData(sfield.toUtf8(), false);
+        //SMorphoProtocol morpho = MORPHO_GetProtocol();
+        //QString sfield = QString("MORPHO frame final index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
+        //ui->console->putData(sfield.toUtf8(), false);
 
         if(!m_ackDisable)
             ack();
@@ -188,7 +188,7 @@ void SagemMorpho::receiveData()
             ui->console->putData(sparams.toUtf8(), false);
             for(int i = 0; i < params.fieldNb; i++)
             {
-                QString sfield = QString("PublicField[%1] size:%2; name:'%3'\r\n").arg(i).arg(params.fieldDescription[i].size).arg(params.fieldDescription[i].name);
+                QString sfield = QString("PublicField[%1] size: %2; name: '%3'\r\n").arg(i).arg(params.fieldDescription[i].size).arg(params.fieldDescription[i].name);
                 ui->console->putData(sfield.toUtf8(), false);
             }
         }
@@ -204,6 +204,12 @@ void SagemMorpho::receiveData()
         {
             const char* userData = NULL;
             err = MORPHO_GetData_Response(value, valueSize, &ilvErr, &userData);
+
+            if(userData)
+            {
+                QString sfield = QString("Data: '%3'\r\n").arg(userData);
+                ui->console->putData(sfield.toUtf8(), false);
+            }
         }
         break;
     case MorphoRequest_ConfigureUart:
@@ -253,9 +259,6 @@ void SagemMorpho::receiveData()
     case MorphoRequest_AsyncMessage:
         {
             const char* msg = NULL;
-
-            ui->console->putDataHex(m_response);
-
             err = MORPHO_AsyncMeassage_Response(value, valueSize, &ilvErr, &msg);
             if(msg)
             {
@@ -266,8 +269,6 @@ void SagemMorpho::receiveData()
         break;
     default:
         {
-            ui->console->putDataHex(m_response);
-
             QString stat = QString("Unexpected data [id:%1]\r\n").arg(identifier);
             ui->console->putDataRaw(stat.toUtf8());
         }
@@ -595,8 +596,8 @@ void SagemMorpho::addRecord(int userId)
 
     QString user = QStringLiteral("%1").arg(userId, 16, 10, QLatin1Char('0'));
 
-    QByteArray hash = QCryptographicHash::hash(QByteArray((const char*)tmplate, sizeof(tmplate)), QCryptographicHash::Sha256);
-    hash.truncate(16);
+    //QByteArray hash = QCryptographicHash::hash(QByteArray((const char*)tmplate, sizeof(tmplate)), QCryptographicHash::Sha256);
+    //hash.truncate(16);
 
     //user data
     size_t userDataSize = 1;
@@ -688,7 +689,7 @@ void SagemMorpho::on_getBaseConfigButton_clicked()
 
 void SagemMorpho::on_getPublicFieldsButton_clicked()
 {
-    m_request = MorphoRequest_GetBaseConfig;
+    m_request = MorphoRequest_GetPublicFields;
     m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
@@ -706,7 +707,7 @@ void SagemMorpho::on_getPublicFieldsButton_clicked()
 
 void SagemMorpho::on_getPublicFieldsButton_2_clicked()
 {
-    m_request = MorphoRequest_GetBaseConfig;
+    m_request = MorphoRequest_GetPublicFields;
     m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
@@ -722,6 +723,25 @@ void SagemMorpho::on_getPublicFieldsButton_2_clicked()
     ui->console->setDataHex(request);
 }
 
+void SagemMorpho::on_getDataButton_clicked()
+{
+    m_request = MorphoRequest_GetData;
+    m_receiveState = ReceiveState_ReceiveSOP;
+
+    m_response.clear();
+    m_responseExt.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    uint16_t indexField = ui->indexFieldBox->value();
+    uint16_t indexUser = ui->indexUserBox->value();
+    MORPHO_GetData_Request(data, &dataSize, indexField, indexUser);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
+}
 
 void SagemMorpho::on_identifyButton_clicked()
 {

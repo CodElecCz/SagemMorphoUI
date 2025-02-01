@@ -58,6 +58,7 @@ private slots:
     void on_cancelButton_clicked();
     void on_getPublicFieldsButton_clicked();
     void on_getPublicFieldsButton_2_clicked();
+    void on_getDataButton_clicked();
 
 private:
     void addRecord(int userId);
