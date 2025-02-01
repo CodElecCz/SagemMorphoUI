@@ -18,6 +18,8 @@
 
 #include "ui_sagemmorpho.h"
 
+#include <QCryptographicHash>
+
 SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SagemMorpho),
@@ -73,7 +75,7 @@ void SagemMorpho::receiveSOP()
 void SagemMorpho::receiveData()
 {
     size_t responseSize = m_response.length();
-    uint8_t packet[10*1024];
+    uint8_t packet[2048];
     size_t packetSize = (responseSize < sizeof(packet))? responseSize : sizeof(packet);
 
     memset(packet, 0, sizeof(packet));
@@ -85,12 +87,11 @@ void SagemMorpho::receiveData()
     uint8_t identifier = 0;
 
     int err = MORPHO_ReceiveData(packet, packetSize, &identifier, &value, &valueSize);
-
     if(err != MORPHO_OK)
     {
         if(err == MORPHO_WARN_DATA_CONTINUE)
         {
-            m_responseExt.append(QByteArray::fromRawData((const char*)value, valueSize), (int)valueSize);
+            m_responseExt.append(QByteArray::fromRawData((const char*)value, valueSize));
             m_response.clear();
 
             SMorphoProtocol morpho = MORPHO_GetProtocol();
@@ -101,17 +102,29 @@ void SagemMorpho::receiveData()
                 ack();
         }
 
-        if(err<=MORPHO_ERR_VAL_LENGTH)
+        if(err <= MORPHO_ERR_VAL_LENGTH)
         {
             QString sfield = QString("err: %1, id: %2, size:%3\r\n").arg(err).arg(identifier).arg(valueSize);
             ui->console->putData(sfield.toUtf8(), false);
         }
         return;
     }
+    else
+    {
+        m_responseExt.append(QByteArray::fromRawData((const char*)value, valueSize));
+        m_response.clear();
+        m_response.append(m_responseExt);
+        m_responseExt.clear();
 
-    SMorphoProtocol morpho = MORPHO_GetProtocol();
-    QString sfield = QString("MORPHO frame final index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
-    ui->console->putData(sfield.toUtf8(), false);
+        SMorphoProtocol morpho = MORPHO_GetProtocol();
+        QString sfield = QString("MORPHO frame final index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
+        ui->console->putData(sfield.toUtf8(), false);
+
+        if(!m_ackDisable)
+            ack();
+    }
+
+    ui->console->putDataHex(m_response);
 
     uint8_t ilvErr = ILV_OK;
     uint8_t ilvStatus = ILVSTS_OK;    
@@ -178,61 +191,46 @@ void SagemMorpho::receiveData()
                 QString sfield = QString("PublicField[%1] size:%2; name:'%3'\r\n").arg(i).arg(params.fieldDescription[i].size).arg(params.fieldDescription[i].name);
                 ui->console->putData(sfield.toUtf8(), false);
             }
-
-            //ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_AddBaseRecord:
-        {
-            uint8_t baseStatus = 0;
+        {            
             uint32_t userIndex = 0;
 
-            err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);
-
-            ui->console->putDataHex(m_response);
+            err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);            
         }
         break;
     case MorphoRequest_GetData:
         {
             const char* userData = NULL;
             err = MORPHO_GetData_Response(value, valueSize, &ilvErr, &userData);
-
-            ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_ConfigureUart:
         {
             err = MORPHO_ConfigureUart_Response(value, valueSize, &ilvErr);
-
-            ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_EraseBase:
         {
             err = MORPHO_EraseBase_Response(value, valueSize, &ilvErr);
-
-            ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_DestroyBase:
         {
             err = MORPHO_DestroyBase_Response(value, valueSize, &ilvErr);
-
-            ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_CreateBase:
         {
             err = MORPHO_CreateBase_Response(value, valueSize, &ilvErr);
-
-            ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_GetPublicFields:
         {
             SMorpho_GetPublicFields params = {};
 
-            err = MORPHO_GetPublicFields_Response(value, valueSize, &ilvErr, &params);
+            err = MORPHO_GetPublicFields_Response((const uint8_t*)m_response.data(), m_response.size(), &ilvErr, &params);
 
             QString sfield = QString("PublicField fieldNb:'%1'\r\n").arg(params.fieldNb);
             ui->console->putData(sfield.toUtf8(), false);
@@ -242,8 +240,6 @@ void SagemMorpho::receiveData()
                 QString sfield = QString("PublicField[%1] name:'%2'\r\n").arg(i).arg(params.fieldDescription[i]);
                 ui->console->putData(sfield.toUtf8(), false);
             }
-
-            ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_Identify:
@@ -252,8 +248,6 @@ void SagemMorpho::receiveData()
             const char* userId = NULL;
 
             err = MORPHO_Identify_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex, &userId);
-
-            ui->console->putDataHex(m_response);
         }
         break;
     case MorphoRequest_AsyncMessage:
@@ -304,9 +298,6 @@ void SagemMorpho::receiveData()
         }
 
     }
-
-    if(!m_ackDisable)
-        ack();
 
     //repeat
     switch(m_request)
@@ -602,12 +593,15 @@ void SagemMorpho::addRecord(int userId)
 
     uint8_t no_check = 1;
 
-    QString user = QStringLiteral("%1").arg(userId, 8, 10, QLatin1Char('0'));
+    QString user = QStringLiteral("%1").arg(userId, 16, 10, QLatin1Char('0'));
+
+    QByteArray hash = QCryptographicHash::hash(QByteArray((const char*)tmplate, sizeof(tmplate)), QCryptographicHash::Sha256);
+    hash.truncate(16);
 
     //user data
     size_t userDataSize = 1;
-    QString userData0 = QStringLiteral("%1").arg(userId, 8, 12, QLatin1Char('9'));
-    char cuserData0[32] = {};
+    QString userData0 = user;
+    char cuserData0[32+1] = {};
     strcpy(cuserData0, userData0.toStdString().c_str());
     const char* userData[] = {cuserData0};
 

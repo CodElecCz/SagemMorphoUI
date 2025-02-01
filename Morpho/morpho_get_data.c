@@ -41,6 +41,39 @@ void MORPHO_GetData_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldI
     MORPHO_AddEOP(packet, packetSize);
 }
 
+void MORPHO_GetDataId_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldIndex, const char userId[])
+{
+    uint8_t data[15];
+    size_t dataSize = 0;
+
+    //DATA 12b
+    //ILV - Identifier 1b/Length 2b/Value
+    data[dataSize++] = ILV_GET_DATA;
+    data[dataSize++] = 5 + 7;
+    data[dataSize++] = 0;
+    data[dataSize++] = 0;	//Database identifier
+    data[dataSize++] = fieldIndex & 0xff;
+    data[dataSize++] = (fieldIndex >> 8) & 0xff;
+    data[dataSize++] = (fieldIndex >> 16) & 0xff;
+    data[dataSize++] = (fieldIndex >> 24) & 0xff;
+
+    //DATA 7b
+    //ILV - Identifier 1b/Length 2b/Value
+    data[dataSize++] = ID_USER_ID;
+    data[dataSize++] = (uint8_t)strlen(userId) + 1; //max 24
+    data[dataSize++] = 0;
+
+    for(int i = 0; i < strlen(userId); i++)
+    {
+        data[dataSize++] = userId[i];
+    }
+    data[dataSize++] = 0;
+
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, MORPHO_GetProtocol().RequestCounter, packet, packetSize);
+    MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
+    MORPHO_AddEOP(packet, packetSize);
+}
+
 /*
 GetBaseConfig Response
 

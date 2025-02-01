@@ -18,7 +18,7 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t max
     uint8_t maxNbOfFp = 2;
 
     uint32_t fieldSize = 1;
-    const char* fieldName[] = {"hash"}; //Field Name: String specifying the field name. The size of this string must be equal to 6.
+    const char* fieldName[] = {"01"}; //Field Name: String specifying the field name. The size of this string must be equal to 6.
 
 	//DATA
 	//ILV - Identifier 1b/Length 2b/Value
@@ -41,7 +41,7 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t max
         data[dataSize++] = 0;
 
         //Field Size: Define the maximum size (in bytes) of a record. It cannot exceed 128 bytes.
-        data[dataSize++] = 0x0f + 1;
+        data[dataSize++] = 0x20 + 1;
         data[dataSize++] = 0;
 
         memcpy(&data[dataSize], fieldName[i], strlen(fieldName[i]));

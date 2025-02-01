@@ -20,6 +20,8 @@ typedef struct SMorphoProtocol
     uint8_t RequestCounter;
     uint8_t ResponseCounter;
 
+    uint8_t Identifier;
+
     //multi frame
     uint8_t PacketIndex;
     uint16_t PacketSizeAct;
