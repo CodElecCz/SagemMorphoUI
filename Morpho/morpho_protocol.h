@@ -15,6 +15,19 @@
 extern "C" {
 #endif
 
+typedef struct SMorphoProtocol
+{
+    uint8_t RequestCounter;
+    uint8_t ResponseCounter;
+
+    //multi frame
+    uint8_t PacketIndex;
+    uint16_t PacketSizeAct;
+    uint16_t PacketSizeTotal;
+} SMorphoProtocol;
+
+SMorphoProtocol MORPHO_GetProtocol(void);
+
 void MORPHO_ResetCounter(void);
 void MORPHO_SetCounter(uint8_t requestCounter);
 uint8_t MORPHO_GetCounter(void);

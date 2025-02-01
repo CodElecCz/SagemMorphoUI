@@ -10,8 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 
-extern uint8_t 	RequestCounter;
-
 void MORPHO_GetPublicFields_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldIndex)
 {
     uint8_t data[15];
@@ -28,7 +26,7 @@ void MORPHO_GetPublicFields_Request(uint8_t* packet, size_t* packetSize, uint32_
     data[dataSize++] = (fieldIndex >> 16) & 0xff;
     data[dataSize++] = (fieldIndex >> 24) & 0xff;
 
-    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, MORPHO_GetProtocol().RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
     MORPHO_AddEOP(packet, packetSize);
 }

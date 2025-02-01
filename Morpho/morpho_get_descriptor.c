@@ -8,8 +8,6 @@
 #include <string.h>
 #include <stdio.h>
 
-extern uint8_t 	RequestCounter;
-
 void MORPHO_GetDescriptorText_Request(uint8_t* packet, size_t* packetSize)
 {    
     uint8_t data[4];
@@ -22,7 +20,7 @@ void MORPHO_GetDescriptorText_Request(uint8_t* packet, size_t* packetSize)
     data[dataSize++] = 0;
     data[dataSize++] = ID_FORMAT_TEXT;
 
-    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, MORPHO_GetProtocol().RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
     MORPHO_AddEOP(packet, packetSize);
 }
@@ -39,7 +37,7 @@ void MORPHO_GetDescriptorBinVer_Request(uint8_t* packet, size_t* packetSize)
     data[dataSize++] = 0;
     data[dataSize++] = ID_FORMAT_BIN;
 
-    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, MORPHO_GetProtocol().RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
     MORPHO_AddEOP(packet, packetSize);
 }
@@ -56,7 +54,7 @@ void MORPHO_GetDescriptorBinMaxUser_Request(uint8_t* packet, size_t* packetSize)
     data[dataSize++] = 0;
     data[dataSize++] = ID_FORMAT_BIN_MAX_USER;
 
-    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, MORPHO_GetProtocol().RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
     MORPHO_AddEOP(packet, packetSize);
 }

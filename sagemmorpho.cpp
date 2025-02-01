@@ -85,18 +85,20 @@ void SagemMorpho::receiveData()
     uint8_t identifier = 0;
 
     int err = MORPHO_ReceiveData(packet, packetSize, &identifier, &value, &valueSize);
+
     if(err != MORPHO_OK)
     {
         if(err == MORPHO_WARN_DATA_CONTINUE)
         {
-            m_responseExt.append(m_response.data(), (int)valueSize);
+            m_responseExt.append(QByteArray::fromRawData((const char*)value, valueSize), (int)valueSize);
+            m_response.clear();
 
-            QString sfield = QString("append: %1\r\n").arg(valueSize);
+            SMorphoProtocol morpho = MORPHO_GetProtocol();
+            QString sfield = QString("MORPHO frame append index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
             ui->console->putData(sfield.toUtf8(), false);
 
             if(!m_ackDisable)
                 ack();
-
         }
 
         if(err<=MORPHO_ERR_VAL_LENGTH)
@@ -106,6 +108,10 @@ void SagemMorpho::receiveData()
         }
         return;
     }
+
+    SMorphoProtocol morpho = MORPHO_GetProtocol();
+    QString sfield = QString("MORPHO frame final index: %1, size: %2, sum: %3, total: %4 \r\n").arg(morpho.PacketIndex).arg(valueSize).arg(morpho.PacketSizeAct).arg(morpho.PacketSizeTotal);
+    ui->console->putData(sfield.toUtf8(), false);
 
     uint8_t ilvErr = ILV_OK;
     uint8_t ilvStatus = ILVSTS_OK;    
@@ -692,6 +698,7 @@ void SagemMorpho::on_getPublicFieldsButton_clicked()
     m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
+    m_responseExt.clear();
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
@@ -709,6 +716,7 @@ void SagemMorpho::on_getPublicFieldsButton_2_clicked()
     m_receiveState = ReceiveState_ReceiveSOP;
 
     m_response.clear();
+    m_responseExt.clear();
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);

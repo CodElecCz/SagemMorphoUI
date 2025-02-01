@@ -14,34 +14,38 @@
 #include <string.h>
 #include <stdio.h>
 
-uint8_t 			RequestCounter = 0;
-static uint8_t 		ResponseCounter = 0;
+static SMorphoProtocol morhpoProtocol = {0, 0};
 
 void MORPHO_ResetCounter(void)
 {
-    RequestCounter = 0;
-    ResponseCounter = 0;
+    morhpoProtocol.RequestCounter = 0;
+    morhpoProtocol.ResponseCounter = 0;
 }
 
 void MORPHO_SetCounter(uint8_t requestCounter)
 {
-	RequestCounter = requestCounter;
+    morhpoProtocol.RequestCounter = requestCounter;
 }
 
 uint8_t MORPHO_GetCounter(void)
 {
-    return RequestCounter;
+    return morhpoProtocol.RequestCounter;
+}
+
+SMorphoProtocol MORPHO_GetProtocol(void)
+{
+    return morhpoProtocol;
 }
 
 void MORPHO_ResponseAck(uint8_t* packet, size_t* packetSize)
 {
-    MORPHO_MakeSOP(PACKED_ID_TYPE_ACK, 1, 1, ResponseCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_ACK, 1, 1, morhpoProtocol.ResponseCounter, packet, packetSize);
     //RequestCounter += 1;
 }
 
 void MORPHO_ResponseNack(uint8_t* packet, size_t* packetSize)
 {
-    MORPHO_MakeSOP(PACKED_ID_TYPE_NACK, 1, 1, ResponseCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_NACK, 1, 1, morhpoProtocol.ResponseCounter, packet, packetSize);
     //RequestCounter += 1;
 }
 
@@ -202,7 +206,7 @@ int MORPHO_ReceiveSOP(const uint8_t* packet, size_t packetSize, uint8_t* RC, uin
     if(!isData && packet[1]&PACKED_ID_TYPE_DATA)
         return MORPHO_ERR_RESPONSE_DATA;
     else if(packet[1] & PACKED_ID_TYPE_ACK || packet[1]&PACKED_ID_TYPE_NACK)
-        RequestCounter += 1;
+        morhpoProtocol.RequestCounter += 1;
 
     if(packet[2] != DLE)
     {
@@ -242,7 +246,7 @@ int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t* identifier, 
     if(err < MORPHO_OK)
         return err;
 
-    ResponseCounter = rc;
+    morhpoProtocol.ResponseCounter = rc;
 
     if(packetSize < (sopSize + 4))
         return MORPHO_ERR_RESPONSE_LENGTH;
@@ -275,12 +279,32 @@ int MORPHO_ReceiveData(uint8_t* packet, size_t packetSize, uint8_t* identifier, 
 
     if(type == 2) //first
     {
+        morhpoProtocol.PacketIndex = 0;
+        morhpoProtocol.PacketSizeAct = lengthPacket;
+        morhpoProtocol.PacketSizeTotal = length;
+
         return MORPHO_WARN_DATA_CONTINUE;
     }
     else if(type == 0) //middle
     {
+        morhpoProtocol.PacketIndex++;
+        morhpoProtocol.PacketSizeAct += lengthPacket;
+
         return MORPHO_WARN_DATA_CONTINUE;
     }
-    else
+    else if(type == 1) //last
+    {
+        morhpoProtocol.PacketIndex++;
+        morhpoProtocol.PacketSizeAct += lengthPacket;
+
         return MORPHO_OK;
+    }
+    else //full frame type == 3
+    {
+        morhpoProtocol.PacketIndex = 0;
+        morhpoProtocol.PacketSizeAct = lengthPacket;
+        morhpoProtocol.PacketSizeTotal = length;
+
+        return MORPHO_OK;
+    }
 }

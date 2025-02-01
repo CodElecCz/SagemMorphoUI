@@ -10,8 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 
-extern uint8_t 	RequestCounter;
-
 void MORPHO_ConfigureUart_Request(uint8_t* packet, size_t* packetSize, uint32_t bps)
 {
     uint8_t data[16];
@@ -39,7 +37,7 @@ void MORPHO_ConfigureUart_Request(uint8_t* packet, size_t* packetSize, uint32_t 
     data[dataSize++] = 0; //send
     data[dataSize++] = 0; //format
 
-    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, MORPHO_GetProtocol().RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
     MORPHO_AddEOP(packet, packetSize);
 }

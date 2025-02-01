@@ -10,8 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 
-extern uint8_t 	RequestCounter;
-
 int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 							     const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
 								 const char* userId,
@@ -67,7 +65,7 @@ int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
     data[1] = 0xff & (dataSize - 3);
     data[2] = 0xff & ((dataSize - 3) >> 8);
 
-    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, RequestCounter, packet, packetSize);
+    MORPHO_MakeSOP(PACKED_ID_TYPE_DATA, 1, 1, MORPHO_GetProtocol().RequestCounter, packet, packetSize);
     MORPHO_AddDataToPacket(packet, packetSize, data, dataSize);
     MORPHO_AddEOP(packet, packetSize);
 
