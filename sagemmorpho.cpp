@@ -91,6 +91,8 @@ void SagemMorpho::receiveData()
     {
         if(err == MORPHO_WARN_DATA_CONTINUE)
         {
+            ui->console->putDataHex(m_response);
+
             m_responseExt.append(QByteArray::fromRawData((const char*)value, valueSize));
             m_response.clear();
 
@@ -102,15 +104,12 @@ void SagemMorpho::receiveData()
                 ack();
         }
 
-        if(err <= MORPHO_ERR_VAL_LENGTH)
-        {
-            QString sfield = QString("err: %1, id: %2, size:%3\r\n").arg(err).arg(identifier).arg(valueSize);
-            ui->console->putData(sfield.toUtf8(), false);
-        }
         return;
     }
     else
     {
+        ui->console->putDataHex(m_response);
+
         m_responseExt.append(QByteArray::fromRawData((const char*)value, valueSize));
         m_response.clear();
         m_response.append(m_responseExt);
@@ -123,8 +122,6 @@ void SagemMorpho::receiveData()
         if(!m_ackDisable)
             ack();
     }
-
-    ui->console->putDataHex(m_response);
 
     uint8_t ilvErr = ILV_OK;
     uint8_t ilvStatus = ILVSTS_OK;    
