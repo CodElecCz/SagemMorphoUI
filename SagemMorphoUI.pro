@@ -20,6 +20,7 @@ SOURCES += \
     Morpho/morpho_get_public_fields.c \
     Morpho/morpho_identify.c \
     Morpho/morpho_protocol.c \
+    Morpho/morpho_remove_base_record.c \
     main.cpp \
     mainwindow.cpp \
     sagemmorpho.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     Morpho/morpho_get_public_fields.h \
     Morpho/morpho_identify.h \
     Morpho/morpho_protocol.h \
+    Morpho/morpho_remove_base_record.h \
     mainwindow.h \
     sagemmorpho.h \
     settingsdialog.h \
