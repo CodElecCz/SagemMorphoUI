@@ -18,7 +18,7 @@
 
 #include "ui_sagemmorpho.h"
 
-//#include <QCryptographicHash>
+#include <QCryptographicHash>
 
 SagemMorpho::SagemMorpho(QWidget *parent) :
     QWidget(parent),
@@ -200,12 +200,28 @@ void SagemMorpho::receiveData()
     case MorphoRequest_GetData:
         {
             const char* userData = NULL;
-            err = MORPHO_GetData_Response(value, valueSize, &ilvErr, &userData);
+            size_t userDataSize = 0;
+            err = MORPHO_GetData_Response(value, valueSize, &ilvErr, &userData, &userDataSize);
 
             if(userData)
             {
-                QString sfield = QString("Data: '%3'\r\n").arg(userData);
-                ui->console->putData(sfield.toUtf8(), false);
+                if(userDataSize == 32)
+                {
+                    QByteArray hash = QByteArray((const char *)&userData[16], 16);
+                    QString shash;
+                    for(int i = 0; i < hash.size(); i++)
+                    {
+                        shash.append(QString::number(static_cast<unsigned char>(hash[i]),16).toUpper().rightJustified(2,'0')+ " ");
+                    }
+
+                    QString sfield = QString("Data: '%1' hash: '%2'\r\n").arg(QString(userData).left(16)).arg(shash);
+                    ui->console->putData(sfield.toUtf8(), false);
+                }
+                else
+                {
+                    QString sfield = QString("Data: '%1'\r\n").arg(userData);
+                    ui->console->putData(sfield.toUtf8(), false);
+                }
             }
         }
         break;
@@ -240,7 +256,21 @@ void SagemMorpho::receiveData()
 
             for(uint32_t i = 0; i < params.fieldNb; i++)
             {
-                QString sfield = QString("PublicField[%1] name:'%2'\r\n").arg(i).arg(params.fieldDescription[i]);
+                if(params.fieldSize == 32)
+                {
+                    QByteArray hash = QByteArray((const char *)&params.fieldDescription[i][16], 16);
+                    QString shash;
+                    for(int i = 0; i < hash.size(); i++)
+                    {
+                        shash.append(QString::number(static_cast<unsigned char>(hash[i]),16).toUpper().rightJustified(2,'0')+ " ");
+                    }
+
+                    sfield = QString("PublicField[%1] name:'%2' hash:'%3'\r\n").arg(i).arg(QString(params.fieldDescription[i]).left(16)).arg(shash);
+                }
+                else
+                {
+                    sfield = QString("PublicField[%1] name:'%2'\r\n").arg(i).arg(QString(params.fieldDescription[i]).left(16));
+                }
                 ui->console->putData(sfield.toUtf8(), false);
             }
         }
@@ -593,19 +623,23 @@ void SagemMorpho::addRecord(int userId)
 
     QString user = QStringLiteral("%1").arg(userId, 16, 10, QLatin1Char('0'));
 
-    //QByteArray hash = QCryptographicHash::hash(QByteArray((const char*)tmplate, sizeof(tmplate)), QCryptographicHash::Sha256);
-    //hash.truncate(16);
+    QByteArray hash = QCryptographicHash::hash(QByteArray((const char*)tmplate, sizeof(tmplate)), QCryptographicHash::Sha256);
+    hash.truncate(16);
 
     //user data
     size_t userDataSize = 1;
-    QString userData0 = user;
-    char cuserData0[32+1] = {};
-    strcpy(cuserData0, userData0.toStdString().c_str());
+    QByteArray userData0(user.toStdString().c_str(), 16);
+    userData0.append(hash);
+
+    char cuserData0[32] = {};
+    memcpy(cuserData0, userData0.toStdString().c_str(), 32);
     const char* userData[] = {cuserData0};
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
-    MORPHO_AddBaseRecord_Request(data, &dataSize, tmplate, tmplateSize, tmplateId, user.toStdString().c_str(), userData, userDataSize, no_check);
+    MORPHO_AddBaseRecord_Request(data, &dataSize, tmplate, tmplateSize, tmplateId,
+                                 user.toStdString().c_str(), userData, userDataSize, 32,
+                                 no_check);
 
     QByteArray request;
     request.append((char*)data, dataSize);

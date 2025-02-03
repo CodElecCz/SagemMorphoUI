@@ -13,7 +13,7 @@
 int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 							     const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
 								 const char* userId,
-								 const char* userData[], size_t userDataSize,
+                                 const char* userData[], size_t userDataSize, uint8_t userDataFieldSize,
 								 uint8_t no_check)
 {
     uint8_t data[512]; //512
@@ -48,11 +48,10 @@ int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 	{
 		//ILV - Identifier 1b/Length 2b/Value
         data[dataSize++] = ID_PUC_DATA;
-        data[dataSize++] = strlen(userData[i]) + 1;
+        data[dataSize++] = userDataFieldSize;
         data[dataSize++] = 0;
-        memcpy(&data[dataSize], userData[i], strlen(userData[i]));
-        dataSize += strlen(userData[i]);
-        data[dataSize++] = 0;
+        memcpy(&data[dataSize], userData[i], userDataFieldSize);
+        dataSize += userDataFieldSize;
 	}
 
 	//ILV - Identifier 1b/Length 2b/Value

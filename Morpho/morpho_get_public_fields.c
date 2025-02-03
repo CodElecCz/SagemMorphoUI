@@ -77,7 +77,10 @@ int MORPHO_GetPublicFields_Response(const uint8_t* value, size_t valueSize, uint
                     uint16_t fieldSize = value[i+1] + (value[i+2] << 8);
                     uint32_t fieldIndex = value[i+3] + (value[i+4] << 8) + (value[i+5] << 16) + (value[i+6] << 24);
                     uint32_t dataSize = value[i+7] + (value[i+8] << 8) + (value[i+9] << 16) + (value[i+10] << 24);
+
                     fields->fieldDescription[fieldIndex] = &value[i+11];
+                    if(fields->fieldSize == 0)
+                        fields->fieldSize = dataSize;
 
                     i += 10 + dataSize;
 

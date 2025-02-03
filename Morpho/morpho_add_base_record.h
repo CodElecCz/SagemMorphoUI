@@ -18,7 +18,7 @@ extern "C" {
 int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
                                  const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
                                  const char* userId,
-                                 const char* userData[], size_t userDataSize,
+                                 const char* userData[], size_t userDataSize, uint8_t userDataFieldSize,
                                  uint8_t no_check);
 
 int MORPHO_AddBaseRecord_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus, uint8_t* baseStatus, uint32_t* userIndex);

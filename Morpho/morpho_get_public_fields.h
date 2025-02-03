@@ -15,11 +15,12 @@
 extern "C" {
 #endif
 
-#define SMorpho_GetPublicFields_Size    5000
+#define SMorpho_GetPublicFields_Size    10000
 
 typedef struct
 {
     uint32_t fieldNb;
+    uint32_t fieldSize;
     const char* fieldDescription[SMorpho_GetPublicFields_Size];
 } SMorpho_GetPublicFields;
 

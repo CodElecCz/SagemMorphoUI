@@ -92,7 +92,7 @@ GetBaseConfig Response
 	ACK:  02 62 00			- STX + ID + RC
 */
 
-int MORPHO_GetData_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char** userData)
+int MORPHO_GetData_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char* userData[], size_t *userDataSize)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
@@ -104,6 +104,8 @@ int MORPHO_GetData_Response(const uint8_t* value, size_t valueSize, uint8_t* ilv
 	if(status == ILV_OK)
 	{
 		*userData = (const char*)&value[1];
+        if(userDataSize)
+            *userDataSize = valueSize - 1;
 	}
 	else
         return MORPHO_WARN_VAL_ILV_ERROR;
