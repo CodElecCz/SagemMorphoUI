@@ -16,8 +16,8 @@ extern "C" {
 #endif
 
 void MORPHO_RemoveBaseRecord_Request(uint8_t* data, size_t* dataSize, uint32_t userIndex);
-void MORPHO_RemoveBaseRecorId_Request(uint8_t* packet, size_t* packetSize, const char userId[]);
-int MORPHORemoveBaseRecor_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus);
+void MORPHO_RemoveBaseRecordId_Request(uint8_t* packet, size_t* packetSize, const char userId[]);
+int MORPHO_RemoveBaseRecord_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus);
 
 #ifdef __cplusplus
 }

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 
-void MORPHO_RemoveBaseRecor_Request(uint8_t* packet, size_t* packetSize, uint32_t userIndex)
+void MORPHO_RemoveBaseRecord_Request(uint8_t* packet, size_t* packetSize, uint32_t userIndex)
 {
     uint8_t data[11];
     size_t dataSize = 0;
@@ -92,6 +92,15 @@ int MORPHO_RemoveBaseRecord_Response(const uint8_t* value, size_t valueSize, uin
 	uint8_t status = value[0];
     if(ilvStatus)
         *ilvStatus = status;
+
+    if(status == ILV_OK)
+    {
+
+    }
+    else
+    {
+        return MORPHO_WARN_VAL_ILV_ERROR;
+    }
 
 	return MORPHO_OK;
 }

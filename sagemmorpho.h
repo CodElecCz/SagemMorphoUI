@@ -50,6 +50,7 @@ private slots:
     void on_desciptorButton_3_clicked();
     void on_configUartButton_clicked();
     void on_addRecordButton_clicked();
+    void on_removeRecordButton_clicked();
     void on_eraseBaseButton_clicked();
     void on_destroyBaseButton_clicked();
     void on_createBaseButton_clicked();

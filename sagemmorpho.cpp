@@ -14,6 +14,7 @@
 #include "Morpho/morpho_cancel.h"
 #include "Morpho/morpho_get_public_fields.h"
 #include "Morpho/morpho_async_message.h"
+#include "Morpho/morpho_remove_base_record.h"
 #include "Morpho/Ilv_errors.h"
 
 #include "ui_sagemmorpho.h"
@@ -195,6 +196,11 @@ void SagemMorpho::receiveData()
             uint32_t userIndex = 0;
 
             err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);            
+        }
+        break;
+    case MorphoRequest_RemoveBaseRecord:
+        {
+            err = MORPHO_RemoveBaseRecord_Response(value, valueSize, &ilvErr);
         }
         break;
     case MorphoRequest_GetData:
@@ -607,6 +613,24 @@ void SagemMorpho::on_addRecordButton_clicked()
     m_repeat = ui->userCountBox->value();
 
     addRecord(m_userId);
+}
+
+void SagemMorpho::on_removeRecordButton_clicked()
+{
+    m_request = MorphoRequest_RemoveBaseRecord;
+    m_receiveState = ReceiveState_ReceiveSOP;
+
+    m_response.clear();
+
+    uint8_t data[1024];
+    size_t dataSize = sizeof(data);
+    uint16_t indexUser = ui->indexUserRemoveBox->value();
+    MORPHO_RemoveBaseRecord_Request(data, &dataSize, indexUser);
+
+    QByteArray request;
+    request.append((char*)data, dataSize);
+
+    ui->console->setDataHex(request);
 }
 
 void SagemMorpho::addRecord(int userId)

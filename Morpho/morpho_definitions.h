@@ -23,6 +23,7 @@ enum MorphoRequest
 	MorphoRequest_GetData       = ILV_GET_DATA,
 	MorphoRequest_GetPublicFields  = ILV_GET_PUBLIC_FIELDS,
 	MorphoRequest_AddBaseRecord = ILV_ADD_RECORD,
+    MorphoRequest_RemoveBaseRecord = ILV_REMOVE_RECORD,
     MorphoRequest_EraseBase     = ILV_ERASE_BASE,
     MorphoRequest_DestroyBase   = ILV_DESTROY_DB,
     MorphoRequest_CreateBase    = ILV_CREATE_DB,
