@@ -41,7 +41,7 @@ void MORPHO_GetData_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldI
     MORPHO_AddEOP(packet, packetSize);
 }
 
-void MORPHO_GetDataId_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldIndex, const char userId[])
+void MORPHO_GetDataId_Request(uint8_t* packet, size_t* packetSize, uint32_t fieldIndex, const char* userId)
 {
     uint8_t data[35];
     size_t dataSize = 0;
@@ -63,9 +63,9 @@ void MORPHO_GetDataId_Request(uint8_t* packet, size_t* packetSize, uint32_t fiel
     data[dataSize++] = (uint8_t)strlen(userId) + 1; //max 24
     data[dataSize++] = 0;
 
-    for(int i = 0; i < strlen(userId); i++)
+    for(uint8_t i = 0; i < strlen(userId); i++)
     {
-        data[dataSize++] = userId[i];
+        data[dataSize++] = (uint8_t)userId[i];
     }
     data[dataSize++] = 0;
 
@@ -92,7 +92,7 @@ GetBaseConfig Response
 	ACK:  02 62 00			- STX + ID + RC
 */
 
-int MORPHO_GetData_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const char* userData[], size_t *userDataSize)
+int MORPHO_GetData_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, const uint8_t* userData[], uint8_t* userDataSize)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
@@ -103,9 +103,9 @@ int MORPHO_GetData_Response(const uint8_t* value, size_t valueSize, uint8_t* ilv
 
 	if(status == ILV_OK)
 	{
-		*userData = (const char*)&value[1];
+        *userData = &value[1];
         if(userDataSize)
-            *userDataSize = valueSize - 1;
+            *userDataSize = (uint8_t)valueSize - 1;
 	}
 	else
         return MORPHO_WARN_VAL_ILV_ERROR;

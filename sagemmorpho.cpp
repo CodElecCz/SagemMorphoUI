@@ -210,8 +210,8 @@ void SagemMorpho::receiveData()
         break;
     case MorphoRequest_GetData:
         {
-            const char* userData = NULL;
-            size_t userDataSize = 0;
+            const uint8_t* userData = NULL;
+            uint8_t userDataSize = 0;
             err = MORPHO_GetData_Response(value, valueSize, &ilvErr, &userData, &userDataSize);
 
             if(userData)
@@ -225,12 +225,12 @@ void SagemMorpho::receiveData()
                         shash.append(QString::number(static_cast<unsigned char>(hash[i]),16).toUpper().rightJustified(2,'0')+ " ");
                     }
 
-                    QString sfield = QString("Data: '%1' hash: '%2'\r\n").arg(QString(userData).left(16)).arg(shash);
+                    QString sfield = QString("Data: '%1' hash: '%2'\r\n").arg(QString((const char*)userData).left(16)).arg(shash);
                     ui->console->putData(sfield.toUtf8(), false);
                 }
                 else
                 {
-                    QString sfield = QString("Data: '%1'\r\n").arg(userData);
+                    QString sfield = QString("Data: '%1'\r\n").arg((const char*)userData);
                     ui->console->putData(sfield.toUtf8(), false);
                 }
             }
