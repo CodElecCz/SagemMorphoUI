@@ -88,10 +88,10 @@ Identify Response
 	ACK:  02 62 00			- STX + ID + RC
 */
 
-int MORPHO_Identify_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, uint8_t *baseStatus, uint32_t* userIndex, const char **userId)
+int MORPHO_Identify_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, SMorpho_Identify *identify)
 {
 	if(valueSize==0)
-		return MORPHO_WARN_VAL_NO_DATA;
+		return MORPHO_WARN_VAL_NO_DATA;    
 
 	//all data collected
     uint8_t err = value[0];
@@ -102,23 +102,26 @@ int MORPHO_Identify_Response(const uint8_t* value, size_t valueSize, uint8_t* il
         if(valueSize > 1)
         {
             uint8_t status = value[1];
-            if(baseStatus)
-                *baseStatus = status;
+            if(identify)
+                identify->baseStatus = status;
 
             if(status != ILVSTS_HIT)
                 return MORPHO_WARN_VAL_ILV_STATUS;
 
             if(valueSize > 5)
             {
-                if(userIndex)
-                    *userIndex = value[2] + (value[3] << 8) + (value[4] << 16) + (value[5] << 24);
+                if(identify)
+                    identify->userIndex = (uint32_t)value[2] + (uint32_t)(value[3] << 8) + (uint32_t)(value[4] << 16) + (uint32_t)(value[5] << 24);
             }
 
             if(valueSize > 9 && value[6] == ID_USER_ID)
             {
-            	uint8_t length = value[7] + (value[8] << 8);
-				if(userId)
-					*userId = (const char*)&value[9];
+                uint16_t length = (uint16_t)value[7] + (uint16_t)(value[8] << 8);
+                if(identify)
+                {
+                    identify->userIdSize = length;
+                    identify->userId = (const char*)&value[9];
+                }
             }
         }
 	}

@@ -13,7 +13,7 @@
 int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 							     const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
 								 const char* userId,
-                                 const char* userData[], size_t userDataSize, uint8_t userDataFieldSize,
+                                 SMorpho_AddBaseRecord_UserData userData,
 								 uint8_t no_check)
 {
     uint8_t data[512]; //512
@@ -38,20 +38,20 @@ int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
 
 	//ILV - Identifier 1b/Length 2b/Value
     data[dataSize++] = ID_USER_ID;
-    data[dataSize++] = strlen(userId) + 1;	//The maximum size (L) of the User ID is 24 bytes
+    data[dataSize++] = (uint8_t)strlen(userId) + 1;	//The maximum size (L) of the User ID is 24 bytes
     data[dataSize++] = 0;
     memcpy(&data[dataSize], userId, strlen(userId));
     dataSize += strlen(userId);
     data[dataSize++] = 0;
 
-	for(int i = 0; i < userDataSize; i++)
+    for(int i = 0; i < userData.dataSize; i++)
 	{
 		//ILV - Identifier 1b/Length 2b/Value
         data[dataSize++] = ID_PUC_DATA;
-        data[dataSize++] = userDataFieldSize;
+        data[dataSize++] = userData.fieldSize;
         data[dataSize++] = 0;
-        memcpy(&data[dataSize], userData[i], userDataFieldSize);
-        dataSize += userDataFieldSize;
+        memcpy(&data[dataSize], userData.data[i], userData.fieldSize);
+        dataSize += userData.fieldSize;
 	}
 
 	//ILV - Identifier 1b/Length 2b/Value
@@ -111,7 +111,7 @@ int MORPHO_AddBaseRecord_Response(const uint8_t* value, size_t valueSize, uint8_
         }
 
         if(valueSize>5)
-            *userIndex = value[2] + (value[3] << 8) + (value[4] << 16) + (value[5] << 24);
+            *userIndex = (uint32_t)value[2] + (uint32_t)(value[3] << 8) + (uint32_t)(value[4] << 16) + (uint32_t)(value[5] << 24);
 	}
 	else
         return MORPHO_WARN_VAL_ILV_ERROR;

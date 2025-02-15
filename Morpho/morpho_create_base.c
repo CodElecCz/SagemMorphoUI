@@ -10,15 +10,12 @@
 #include <string.h>
 #include <stdio.h>
 
-void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t maxNbOfRec)
+void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t maxNbOfRec, SMorpho_CreateBase_UserData userData)
 {
     uint8_t data[256];
     size_t dataSize = 0;
 
     uint8_t maxNbOfFp = 2;
-
-    uint32_t fieldSize = 1;
-    const char* fieldName[] = {"id&sh"}; //Field Name: String specifying the field name. The size of this string must be equal to 6.
 
 	//DATA
 	//ILV - Identifier 1b/Length 2b/Value
@@ -33,7 +30,7 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t max
 
     data[dataSize++] = maxNbOfFp;
 
-    for(int i = 0; i < fieldSize; i++)
+    for(uint8_t i = 0; i < userData.fieldCount; i++)
 	{
 		//ILV - Identifier 1b/Length 2b/Value
         data[dataSize++] = ID_PUBLIC_FIELD;
@@ -41,13 +38,15 @@ void MORPHO_CreateBase_Request(uint8_t* packet, size_t* packetSize, uint16_t max
         data[dataSize++] = 0;
 
         //Field Size: Define the maximum size (in bytes) of a record. It cannot exceed 128 bytes.
-        data[dataSize++] = 0x20;
+        data[dataSize++] = userData.fieldSize;
         data[dataSize++] = 0;
 
-        memcpy(&data[dataSize], fieldName[i], strlen(fieldName[i]));
-        dataSize += strlen(fieldName[i]);
+        //Field Name: String specifying the field name. The size of this string must be equal to 6.
+        uint8_t fieldNameSize = (strlen(userData.fieldName[i]) > 6)? 6 : (uint8_t)strlen(userData.fieldName[i]);
+        memcpy(&data[dataSize], userData.fieldName[i], fieldNameSize);
+        dataSize += fieldNameSize;
 
-        for(size_t j = strlen(fieldName[i]); j < 6; j++)
+        for(uint8_t j = fieldNameSize; j < 6; j++)
             data[dataSize++] = 0;
 	}
 

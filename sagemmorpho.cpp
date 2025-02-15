@@ -195,7 +195,12 @@ void SagemMorpho::receiveData()
         {            
             uint32_t userIndex = 0;
 
-            err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);            
+            err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);
+            if(err == MORPHO_OK)
+            {
+                QString sfield = QString("UserIndex: %1\r\n").arg(userIndex);
+                ui->console->putData(sfield.toUtf8(), false);
+            }
         }
         break;
     case MorphoRequest_RemoveBaseRecord:
@@ -283,10 +288,10 @@ void SagemMorpho::receiveData()
         break;
     case MorphoRequest_Identify:
         {
-            uint32_t userIndex = 0;
-            const char* userId = NULL;
+            SMorpho_Identify identify = {};
 
-            err = MORPHO_Identify_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex, &userId);
+            err = MORPHO_Identify_Response(value, valueSize, &ilvErr, &identify);
+            ilvStatus = identify.baseStatus;
         }
         break;
     case MorphoRequest_AsyncMessage:
@@ -647,22 +652,25 @@ void SagemMorpho::addRecord(int userId)
 
     QString user = QStringLiteral("%1").arg(userId, 16, 10, QLatin1Char('0'));
 
+    //user data
+    SMorpho_AddBaseRecord_UserData userData;
+
+    QByteArray userData0(user.toStdString().c_str(), 16);
     QByteArray hash = QCryptographicHash::hash(QByteArray((const char*)tmplate, sizeof(tmplate)), QCryptographicHash::Sha256);
     hash.truncate(16);
-
-    //user data
-    size_t userDataSize = 1;
-    QByteArray userData0(user.toStdString().c_str(), 16);
     userData0.append(hash);
 
-    char cuserData0[32] = {};
-    memcpy(cuserData0, userData0.toStdString().c_str(), 32);
-    const char* userData[] = {cuserData0};
+    userData.fieldSize = 32;
+    userData.dataSize = 1;
+    userData.data[0] = (const uint8_t*)userData0.data();
 
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
-    MORPHO_AddBaseRecord_Request(data, &dataSize, tmplate, tmplateSize, tmplateId,
-                                 user.toStdString().c_str(), userData, userDataSize, 32,
+
+    MORPHO_AddBaseRecord_Request(data, &dataSize,
+                                 tmplate, tmplateSize, tmplateId,
+                                 user.toStdString().c_str(),
+                                 userData,
                                  no_check);
 
     QByteArray request;
@@ -716,7 +724,13 @@ void SagemMorpho::on_createBaseButton_clicked()
     uint8_t data[1024];
     size_t dataSize = sizeof(data);
     uint16_t nbRec = ui->dbsRecNbBox->value();
-    MORPHO_CreateBase_Request(data, &dataSize, nbRec);
+
+    SMorpho_CreateBase_UserData userData = {};
+    userData.fieldCount = 1;
+    userData.fieldSize = 32;
+    userData.fieldName[0] = "id&sh";
+
+    MORPHO_CreateBase_Request(data, &dataSize, nbRec, userData);
 
     QByteArray request;
     request.append((char*)data, dataSize);
