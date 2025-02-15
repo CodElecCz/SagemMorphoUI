@@ -90,7 +90,7 @@ GetBaseConfig Response
 	ACK:  02 62 00			- STX + ID + RC
 */
 
-int MORPHO_AddBaseRecord_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, uint8_t *baseStatus, uint32_t* userIndex)
+int MORPHO_AddBaseRecord_Response(const uint8_t* value, size_t valueSize, uint8_t* ilvStatus, SMorpho_AddBaseRecord *rec)
 {
 	if(valueSize==0)
 		return MORPHO_WARN_VAL_NO_DATA;
@@ -104,14 +104,18 @@ int MORPHO_AddBaseRecord_Response(const uint8_t* value, size_t valueSize, uint8_
         if(valueSize>1)
         {
             uint8_t status = value[1];
-            if(baseStatus) *baseStatus = status;
+            if(rec)
+                rec->baseStatus = status;
 
             if(status != ILVSTS_OK)
                 return MORPHO_WARN_VAL_ILV_STATUS;
         }
 
-        if(valueSize>5)
-            *userIndex = (uint32_t)value[2] + (uint32_t)(value[3] << 8) + (uint32_t)(value[4] << 16) + (uint32_t)(value[5] << 24);
+        if(valueSize > 5)
+        {
+            if(rec)
+                rec->userIndex = (uint32_t)value[2] + (uint32_t)(value[3] << 8) + (uint32_t)(value[4] << 16) + (uint32_t)(value[5] << 24);
+        }
 	}
 	else
         return MORPHO_WARN_VAL_ILV_ERROR;

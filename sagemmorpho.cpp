@@ -193,12 +193,14 @@ void SagemMorpho::receiveData()
         break;
     case MorphoRequest_AddBaseRecord:
         {            
-            uint32_t userIndex = 0;
+            SMorpho_AddBaseRecord rec = {};
 
-            err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &ilvStatus, &userIndex);
+            err = MORPHO_AddBaseRecord_Response(value, valueSize, &ilvErr, &rec);
+            ilvStatus = rec.baseStatus;
+
             if(err == MORPHO_OK)
             {
-                QString sfield = QString("UserIndex: %1\r\n").arg(userIndex);
+                QString sfield = QString("UserIndex: %1\r\n").arg(rec.userIndex);
                 ui->console->putData(sfield.toUtf8(), false);
             }
         }

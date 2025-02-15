@@ -24,13 +24,19 @@ typedef struct
     uint8_t fieldSize;
 } SMorpho_AddBaseRecord_UserData;
 
+typedef struct
+{
+    uint8_t baseStatus;
+    uint32_t userIndex;
+} SMorpho_AddBaseRecord;
+
 int MORPHO_AddBaseRecord_Request(uint8_t* packet, size_t* packetSize,
                                  const uint8_t tmplate[], size_t tmplateSize, uint8_t tmplateId,
                                  const char* userId,
                                  SMorpho_AddBaseRecord_UserData userData,
                                  uint8_t no_check);
 
-int MORPHO_AddBaseRecord_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus, uint8_t* baseStatus, uint32_t* userIndex);
+int MORPHO_AddBaseRecord_Response(const uint8_t* data, size_t dataSize, uint8_t* ilvStatus, SMorpho_AddBaseRecord* rec);
 
 #ifdef __cplusplus
 }
